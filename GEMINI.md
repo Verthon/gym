@@ -4,114 +4,102 @@ This document outlines the rules and patterns for creating domain model classes 
 
 These guidelines are inspired by and aligned with the patterns in the [DomainDrivers/dd-typescript](https://github.com/DomainDrivers/dd-typescript) repository.
 
----
+> Smallest set of rules + tiny snippets so an LLM can model robust code fast.
 
-## Core Philosophy
+## How to Pick the Building Block
 
-1. **Protect Invariants at All Times**: An object, especially an Aggregate, must not exist in an invalid state. Validation is not an optional step; it is integral to an object's lifecycle.
-2. **Model the Ubiquitous Language**: Class and method names should reflect the language used by domain experts. The code should read like a description of the business process.
-3. **Fail Fast and Explicitly**: Business rule violations are predictable failures, not exceptional events. We handle them by returning a `Result` object, forcing the calling code to handle the outcome. We do not throw exceptions for business validation.
+| If you need… | Choose | Key traits |
+|--------------|--------|-----------|
+| - stable identity- lifecycle changes- event emission | **Entity** | has `id`, mutable via behaviors |
+| - pure description- no identity- safe reuse | **Value Object** | immutable, structural equality |
 
----
+## 1. Value Object (V O)
 
-## 1. Aggregates
+**Purpose:** capture a descriptive concept (e.g., *ISBN*, *Money*).
 
-An Aggregate is a cluster of domain objects (Entities and Value Objects) that can be treated as a single unit.
+### Mandatory attributes
 
-### Rules for Aggregates
+- Immutable MUST-HAVE
+- Immutable state (`readonly`, `Object.freeze`).
+- Self-validated in factory.
+- Follows validation from least cost heavy for CPU and memory to most heavy one (fail-fast)
+- Can have methods with the behaviors as long it doesn't mutate state
+- Equality by **all** properties (structural equality).
+- Should be composable
+- Pure helpers only (no side effects).
+- Tests for VO would require few lines of code and should be simple units
 
-* **Private Constructor**: The constructor must be `private`. This prevents direct, uncontrolled instantiation.
-* **Static Factory Method**: Aggregates must be created via a `public static` factory method (e.g., `create()`, `prepare()`, `initiate()`). This method is the sole entry point for creating a valid instance.
-* **Upfront, Atomic Validation**: The static factory method is responsible for enforcing all business rules (invariants). It must receive all required data, validate it, and only if all rules pass, create and return the new instance.
-* **Result-Oriented Return**: The factory method must return a `Result` type (e.g., `{ success: true; value: T } | { success: false; error: string }`). This makes success and failure explicit.
-* **Immutability First**: Properties should be `readonly` by default. State changes should be handled by explicit behavior methods.
-* **Explicit Behavior Methods**: Any change to an Aggregate's state must occur through a well-named public method (e.g., `signContract()`, `cancelSubscription()`). These methods contain the logic and validation for that specific state transition. Avoid public setters.
+### Mini-pattern
 
-### Aggregate Skeleton
+```ts
+export class Money {
+  private constructor(
+    public readonly amount: number,
+    public readonly currency: 'USD' | 'EUR'
+  ) {
+    if (amount  {
+    if (this._status !== 'Pending') return left('AlreadyActive');
+    this._status = 'Active';
+    return right(new MembershipActivated(this._id));
+  }
 
-```typescript
-type CreateAggregateProps = { /* raw data for creation */ };
-
-class MyAggregate {
-    // Properties are readonly and encapsulate Value Objects
-    private readonly id: AggregateId;
-    private readonly someValueObject: SomeValueObject;
-
-    // Constructor is private
-    private constructor(props: { id: AggregateId, someValueObject: SomeValueObject }) {
-        this.id = props.id;
-        this.someValueObject = props.someValueObject;
-    }
-
-    // Static factory for controlled creation and validation
-    public static create(props: CreateAggregateProps): { success: true; value: MyAggregate } | { success: false; error: string } {
-        // 1. Validate and create Value Objects first
-        const voResult = SomeValueObject.create({ value: props.someValue });
-        if (!voResult.success) {
-            return voResult;
-        }
-
-        // 2. Validate aggregate-level business rules
-        if (/* some aggregate rule is violated */) {
-            return { success: false, error: 'Aggregate rule violation message.' };
-        }
-
-        // 3. Create and return the valid aggregate
-        const aggregate = new MyAggregate({ id: new AggregateId(), someValueObject: voResult.value });
-        return { success: true, value: aggregate };
-    }
-
-    // Behavior method that enforces invariants for a state change
-    public doSomething(): { success: true } | { success: false; error: string } {
-        if (/* check if this action is currently allowed */) {
-            // Mutate internal state
-            // this.status = 'SomethingDone';
-            return { success: true };
-        }
-        return { success: false, error: 'Cannot perform this action right now.' };
-    }
+  // read-only accessors
+  get id()     { return this._id; }
+  get status() { return this._status; }
 }
 ```
 
----
+## 2. Entity
 
-## 2. Value Objects (VOs)
+Purpose: track an object that matters by identity (e.g., Member, Book).
+Mandatory attributes
 
-A Value Object is an immutable object that represents a descriptive aspect of the domain. It is defined by its attributes, not a unique identity.
+- Mutable so we need to guarantee that mutations are done via methods that checks all the business rules
+- Typed id object (avoid raw strings).
+- Private fields; expose read-only getters.
+- State changes ONLY via named methods.
+- Each method checks invariants first.
+- Emits domain events internally.
 
-### Rules for Value Objects
+### Mini-pattern
 
-* **Immutability**: A VO must be immutable. All its properties must be `readonly`.
-* **Self-Validation**: A VO is responsible for its own validity. It should not be possible to create an invalid VO.
-* **Private Constructor & Static Factory**: Like Aggregates, VOs must have a `private constructor` and be created via a `public static create()` method that performs validation.
-* **Structural Equality**: Two VOs are considered equal if all their attributes are equal. If needed, provide an `equals()` method to check for this.
-
-### Value Object Skeleton
-
-```typescript
-type MyValueObjectProps = {
-    value: string;
-};
-
-class MyValueObject {
-    public readonly value: string;
-
-    // Constructor is private
-    private constructor(props: MyValueObjectProps) {
-        this.value = props.value;
-    }
-
-    // Static factory for self-validation
-    public static create(props: MyValueObjectProps): { success: true; value: MyValueObject } | { success: false; error: string } {
-        if (!props.value || props.value.length < 3) {
-            return { success: false, error: 'Value must be at least 3 characters long.' };
-        }
-        return { success: true, value: new MyValueObject(props) };
-    }
-
-    // Optional: Implement for structural equality checks
-    public equals(other?: MyValueObject): boolean {
-        return !!other && this.value === other.value;
-    }
+```ts
+/** Typed identifier */
+export class MemberId {
+  constructor(public readonly value: string) {}
+  static new(): MemberId { return new MemberId(crypto.randomUUID()); }
+  equals(other: MemberId) { return this.value === other.value; }
 }
+
+/** Entity root */
+export class Member {
+  private _status: 'Pending' | 'Active';
+
+  constructor(
+    private readonly _id: MemberId,
+    private_email: Email,
+    status: 'Pending' | 'Active' = 'Pending'
+  ) { this._status = status; }
+
+  static register(email: Email): Member {
+    return new Member(MemberId.new(), email);
+  }
+
+  activate(): Either<'AlreadyActive', MembershipActivated> {
+    if (this._status !== 'Pending') return left('AlreadyActive');
+    this._status = 'Active';
+    return right(new MembershipActivated(this._id));
+  }
+
+  // read-only accessors
+  get id()     { return this._id; }
+  get status() { return this._status; }
+}
+```
+
+## One-Line Refresher
+
+```
+Entity  = identity + guarded mutability + events.
+Value Object = immutable + no identity + pure logic.
 ```

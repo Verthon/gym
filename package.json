@@ -1,0 +1,22 @@
+{
+	"name": "gym",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"type-check": "tsc --noEmit",
+		"test:unit": "vitest run"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.9.0",
+	"dependencies": {
+		"date-fns": "4.1.0",
+		"typescript": "5.8.3"
+	},
+	"devDependencies": {
+		"vite-tsconfig-paths": "5.1.4",
+		"vitest": "3.2.4"
+	}
+}

@@ -14,3 +14,17 @@ The gym management domain is centered around handling the essential business pro
 
 3. Pass Registration:
     Oversees pass issuance, cancellation, and expiration.
+
+### Contracting
+
+#### Contract Draft
+Actors:
+
+- Sales specialist
+- Potential Customer
+
+Policies (All must be met for valid contract):
+
+- 18 years old + or guardian co-signature for minors
+- contract must have verified government verified ID of the potential customer
+- contract must have clear fees structure (penalities, monthly dues, enrollment fees)
