@@ -4,6 +4,8 @@ import type { BirthDate } from "./BirthDate.mjs";
 import type { GuardianCoSignature } from "./GuardianCoSignature.mjs";
 import type { PersonId } from "./PersonId.mjs";
 import type { FeeStructure } from "@/money/FeeStructure.mjs";
+import type { DomainEvent } from "@/events/event.mjs";
+import { contractPrepared } from "./events.mjs";
 
 type DraftStatus = "Draft" | "ReadyToSign";
 export type ContractDraftProps = {
@@ -30,6 +32,7 @@ export type ContractDraftError =
 export class ContractDraft {
 	private _props: ContractDraftProps;
 	private _status: DraftStatus;
+	private _events: DomainEvent[] = [];
 
 	private constructor(props: ContractDraftProps) {
 		this._props = props;
@@ -75,16 +78,28 @@ export class ContractDraft {
 		}
 
 		this._status = "ReadyToSign";
+		this._events.push(
+			contractPrepared({
+				personId: this._props.userInfo.personId,
+				fees: this._props.offer.fees,
+			})
+		);
 		return { success: true, value: undefined };
 	}
 
-	status(): DraftStatus {
+	public status(): DraftStatus {
 		return this._status;
 	}
-	fees(): FeeStructure {
+	public fees(): FeeStructure {
 		return this._props.offer.fees;
 	}
-	userId(): PersonId {
+	public userId(): PersonId {
 		return this._props.userInfo.personId;
+	}
+
+	public pullEvents(): DomainEvent[] {
+		const out = this._events;
+		this._events = [];
+		return out;
 	}
 }
