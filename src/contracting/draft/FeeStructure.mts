@@ -1,4 +1,4 @@
-import type { Result } from "../../utils/Result.js";
+import type { Result } from "@/utils/Result.mjs";
 
 export type FeeStructureProps = {
 	monthlyDues: number;

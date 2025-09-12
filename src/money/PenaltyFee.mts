@@ -1,12 +1,15 @@
 import { Money } from "./Money.mjs";
+import { err } from "@/utils/Result.mjs";
 
 export type PenaltyFeeError =
 	| { code: "ZERO_OR_NEGATIVE"; context: { amount: string } }
-	| { code: "EXCEEDS_MAXIMUM"; context: { amount: string; maximum: string } }
-	| {
-			code: "INVALID_REASON";
-			context: { reason: string; validReasons: string[] };
-	  };
+  | { code: "EXCEEDS_MAXIMUM"; context: { amount: string; maximum: string } }
+  | { code: "INVALID_CURRENCY"; context: { currency: string } }
+  | {
+    code: "INVALID_REASON";
+    context: { reason: string; validReasons: string[] };
+    };
+		
 
 export class PenaltyFee {
 	private readonly amount: Money;
@@ -58,7 +61,7 @@ export class PenaltyFee {
 		// Business rule: penalty fee cannot exceed $200
 		const maxAmount = Money.fromMajor("200.00", amount.getCurrency());
 		if (!maxAmount.success) {
-			return { success: false, error: maxAmount.error };
+return err({ code: "INVALID_CURRENCY", context: { currency: amount.getCurrency() } });
 		}
 
 		if (amount.getAmountMinor() > maxAmount.value.getAmountMinor()) {

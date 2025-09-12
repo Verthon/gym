@@ -1,3 +1,5 @@
+import { UnsignedContract } from "../unsigned-contract/UnsignedContract.mjs";
+
 import { LocalDate } from "@/utils/LocalDate.mjs";
 import type { GovernmentIdInfo } from "./GovernmentIdInfo.mjs";
 import type { BirthDate } from "./BirthDate.mjs";
@@ -5,7 +7,7 @@ import type { GuardianCoSignature } from "./GuardianCoSignature.mjs";
 import type { PersonId } from "./PersonId.mjs";
 import type { FeeStructure } from "@/money/FeeStructure.mjs";
 import type { DomainEvent } from "@/events/event.mjs";
-import { contractPrepared } from "./events.mjs";
+import { contractPrepared, toGenericEvent } from "./events.mjs";
 
 type DraftStatus = "Draft" | "ReadyToSign";
 export type ContractDraftProps = {
@@ -50,8 +52,8 @@ export class ContractDraft {
 	public toNotSignedContract(
 		asOf: LocalDate,
 		guardian?: GuardianCoSignature
-	):
-		| { success: true; value: void }
+	): 
+		| { success: true; value: UnsignedContract } 
 		| { success: false; error: ContractDraftError } {
 		if (this._status !== "Draft")
 			return { success: false, error: { code: "INVALID_STATUS" } };
@@ -79,12 +81,18 @@ export class ContractDraft {
 
 		this._status = "ReadyToSign";
 		this._events.push(
-			contractPrepared({
-				personId: this._props.userInfo.personId,
-				fees: this._props.offer.fees,
-			})
+			toGenericEvent(
+				contractPrepared({
+					personId: this._props.userInfo.personId,
+					fees: this._props.offer.fees,
+				})
+			)
 		);
-		return { success: true, value: undefined };
+		const unsignedContract = UnsignedContract.create({
+			personId: this._props.userInfo.personId,
+			fees: this._props.offer.fees,
+		});
+		return { success: true, value: unsignedContract };
 	}
 
 	public status(): DraftStatus {

@@ -1,8 +1,10 @@
 import { Money } from "./Money.mjs";
+import { err } from "@/utils/Result.mjs";
 
 export type EnrollmentFeeError =
 	| { code: "NEGATIVE_AMOUNT"; context: { amount: string } }
-	| { code: "EXCEEDS_MAXIMUM"; context: { amount: string; maximum: string } };
+	| { code: "EXCEEDS_MAXIMUM"; context: { amount: string; maximum: string } }
+	| { code: "INVALID_CURRENCY"; context: { currency: string } };
 
 export class EnrollmentFee {
 	private readonly amount: Money;
@@ -30,7 +32,7 @@ export class EnrollmentFee {
 		// Business rule: enrollment fee cannot exceed $500
 		const maxAmount = Money.fromMajor("500.00", amount.getCurrency());
 		if (!maxAmount.success) {
-			return { success: false, error: maxAmount.error };
+return err({ code: "INVALID_CURRENCY", context: { currency: amount.getCurrency() } });
 		}
 
 		if (amount.getAmountMinor() > maxAmount.value.getAmountMinor()) {
