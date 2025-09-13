@@ -29,7 +29,7 @@ export class UnsignedContract {
     return new UnsignedContract(props);
   }
 
-  public confirmServiceCommitment(
+  public confirmServiceCommitmentBySalesSpecialist(
     at: LocalDate
   ): Result<void, "INVALID_STATE"> {
     switch (this.state.kind) {
@@ -55,7 +55,7 @@ export class UnsignedContract {
     }
   }
 
-  public acceptTermsAndConditions(
+  public acceptTermsAndConditionsByCustomer(
     at: LocalDate
   ): Result<void, "INVALID_STATE"> {
     switch (this.state.kind) {
@@ -64,21 +64,30 @@ export class UnsignedContract {
         return okVoid();
       case "ConfirmedBySales":
         this.state = { kind: "Signed", at };
-        this.events.push(
-          toGenericEvent(
-            contractSigned(
-              {
-                personId: this.props.personId,
-                fees: this.props.fees,
-              },
-              at
-            )
-          )
-        );
         return okVoid();
       default:
         return err("INVALID_STATE");
     }
+  }
+
+  public toSignedContract() {
+    if (this.state.kind !== "Signed") {
+      return err({ code: "NOT_FULLY_SIGNED" });
+    }
+
+    this.events.push(
+      toGenericEvent(
+        contractSigned(
+          {
+            personId: this.props.personId,
+            fees: this.props.fees,
+          },
+          this.state.at
+        )
+      )
+    );
+
+    return okVoid();
   }
 
   public pullEvents(): DomainEvent[] {
