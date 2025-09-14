@@ -18,7 +18,7 @@ const enrollment = success(
 );
 const fees = success(FeeStructure.create(monthly, enrollment, []));
 
-describe("UnsignedContract – success paths", () => {
+describe("UnsignedContract - success paths", () => {
   beforeEach(() => {
     vi.spyOn(LocalDate, "today").mockReturnValue(
       LocalDate.fromISO("2025-09-13")

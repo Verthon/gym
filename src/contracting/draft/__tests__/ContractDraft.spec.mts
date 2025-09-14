@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 
 import { LocalDate } from "@/utils/LocalDate.mjs";
 import { failWith, success } from "@/utils/test.mjs";
@@ -13,6 +13,12 @@ import { MonthlyDues } from "@/money/MonthlyDues.mjs";
 import { FeeStructure } from "@/money/FeeStructure.mjs";
 
 describe("ContractDraft - success paths", () => {
+  beforeEach(() => {
+    vi.spyOn(LocalDate, "today").mockReturnValue(
+      LocalDate.fromISO("2025-09-13")
+    );
+  });
+
   it("creates a draft with valid invariants", () => {
     const applicantId = success(PersonId.create("applicant-1"));
     const birthDate = success(
