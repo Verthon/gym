@@ -75,3 +75,7 @@ Policy:
 
 - contract must be active
 - no active pass rule, customer cannot have other active passes of the same type
+
+#### Flow
+
+Draft -> Unsigned Contract -> Signed Contract -> Active Contract
