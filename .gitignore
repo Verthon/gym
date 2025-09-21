@@ -1,17 +1,30 @@
-# Dependencies
-/node_modules
+# dev
+.yarn/
+!.yarn/releases
+.vscode/*
+!.vscode/launch.json
+!.vscode/*.code-snippets
+.idea/workspace.xml
+.idea/usage.statistics.xml
+.idea/shelf
 
-# Build output
-/dist
+# deps
+node_modules/
 
-# Logs
-*.log
-pnpm-debug.log*
-
-# Environment variables
+# env
 .env
-.env.*
-!.env.example
+.env.production
 
-# IDEs and editors
-.vscode/
+# logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# misc
+.DS_Store
+
+dist
