@@ -1,3 +1,9 @@
+/**
+ * Result for better readability
+ * 
+ * Returns Result<T,E> instead of throwing.
+ * See [architecture/error-handling-strategy.md](../../architecture/error-handling-strategy.md).
+ */
 export type Result<T, E> =
 	| { success: true; value: T }
 	| { success: false; error: E };

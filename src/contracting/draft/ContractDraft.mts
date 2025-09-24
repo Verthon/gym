@@ -1,5 +1,3 @@
-import { UnsignedContract } from "../unsigned-contract/UnsignedContract.mjs";
-
 import { LocalDate } from "@/utils/LocalDate.mjs";
 import type { GovernmentIdInfo } from "./GovernmentIdInfo.mjs";
 import type { BirthDate } from "./BirthDate.mjs";

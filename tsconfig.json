@@ -19,5 +19,5 @@
 		/* Vitest Options */
 		"types": ["node", "vitest/globals"]
   },
-  "exclude": ["node_modules", "vitest.config.mts"]
+  "exclude": ["node_modules", "vitest.config.mts", "oxlint.config.mts"]
 }

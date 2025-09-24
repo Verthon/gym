@@ -1,0 +1,42 @@
+{
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn",
+    "style": "warn"
+  },
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc"
+  ],
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**"
+  ],
+  "rules": {
+    "no-console": "warn",
+    "no-var": "error",
+    "prefer-const": "error",
+    "typescript/no-unused-vars": [
+      "error",
+      { "args": "after-used", "ignoreRestSiblings": true }
+    ],
+    "unicorn/prefer-module": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.spec.ts"],
+      "env": {
+        "node": true
+      },
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}
