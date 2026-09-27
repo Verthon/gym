@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm not found on PATH ($PATH)." >&2
+  echo "Fix the environment so pnpm resolves. Do NOT bypass this hook with --no-verify or by changing core.hooksPath." >&2
+  exit 1
+fi
+pnpm -s test

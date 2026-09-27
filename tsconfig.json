@@ -7,17 +7,15 @@
     "skipLibCheck": true,
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "outDir": "./dist",
 
     /* If your code doesn't run in the DOM: */
-		"lib": ["es2022"],
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["src/*"]
-		},
+    "lib": ["es2022"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
 
-		/* Vitest Options */
-		"types": ["node", "vitest/globals"]
+    /* Vitest Options */
+    "types": ["node", "vitest/globals"]
   },
   "exclude": ["node_modules", "vitest.config.mts", "oxlint.config.mts"]
 }

@@ -1,6 +1,18 @@
 {
   "name": "gym",
   "type": "module",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.0.0",
+      "onFail": "download"
+    },
+    "packageManager": {
+      "name": "pnpm",
+      "version": ">=12.0.0 <13.0.0",
+      "onFail": "error"
+    }
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
@@ -8,19 +20,21 @@
     "type-check": "tsc --noEmit",
     "test:unit": "vitest run",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix"
+    "lint:fix": "oxlint --fix",
+    "check": "pnpm lint && pnpm type-check && pnpm test",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@hono/node-server": "1.19.3",
     "date-fns": "4.1.0",
-    "hono": "4.9.8",
-    "typescript": "5.8.3"
+    "hono": "4.9.8"
   },
   "devDependencies": {
     "@types/node": "24.5.2",
-    "oxlint": "1.16.0",
+    "oxlint": "1.85.0",
+    "oxlint-tsgolint": "7.0.2003",
     "tsx": "4.7.1",
-    "typescript": "5.8.3",
+    "typescript": "7.0.2",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4"
   }

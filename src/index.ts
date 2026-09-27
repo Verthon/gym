@@ -7,7 +7,6 @@ app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 
-// Basic health check endpoint
 app.get('/health', (c) => {
   return c.json({ status: 'ok' })
 })

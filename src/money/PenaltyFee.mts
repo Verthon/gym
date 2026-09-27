@@ -9,20 +9,25 @@ export type PenaltyFeeError =
     code: "INVALID_REASON";
     context: { reason: string; validReasons: string[] };
     };
-		
+
+
+const PENALTY_REASONS = [
+	"LATE_PAYMENT",
+	"EARLY_TERMINATION",
+	"DAMAGE_FEE",
+	"ADMINISTRATIVE_FEE",
+] as const;
+
+export type PenaltyReason = (typeof PENALTY_REASONS)[number];
+
+const isPenaltyReason = (value: string): value is PenaltyReason =>
+	PENALTY_REASONS.some((r) => r === value);
 
 export class PenaltyFee {
 	private readonly amount: Money;
-	private readonly reason: string;
+	private readonly reason: PenaltyReason;
 
-	private static readonly VALID_REASONS = [
-		"LATE_PAYMENT",
-		"EARLY_TERMINATION",
-		"DAMAGE_FEE",
-		"ADMINISTRATIVE_FEE",
-	] as const;
-
-	private constructor(amount: Money, reason: string) {
+	private constructor(amount: Money, reason: PenaltyReason) {
 		this.amount = amount;
 		this.reason = reason;
 	}
@@ -34,14 +39,14 @@ export class PenaltyFee {
 		| { success: true; value: PenaltyFee }
 		| { success: false; error: PenaltyFeeError } {
 		// Fail-fast: validate reason first (cheapest validation)
-		if (!this.VALID_REASONS.includes(reason as any)) {
+		if (!isPenaltyReason(reason)) {
 			return {
 				success: false,
 				error: {
 					code: "INVALID_REASON",
 					context: {
 						reason,
-						validReasons: [...this.VALID_REASONS],
+						validReasons: [...PENALTY_REASONS],
 					},
 				},
 			};
@@ -88,7 +93,7 @@ return err({ code: "INVALID_CURRENCY", context: { currency: amount.getCurrency()
 		return this.amount;
 	}
 
-	public getReason(): string {
+	public getReason(): PenaltyReason {
 		return this.reason;
 	}
 }

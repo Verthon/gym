@@ -30,6 +30,11 @@ Policies (All must be met for valid contract):
 - contract must have verified government verified ID of the potential customer
 - contract must have clear fees structure (penalities, monthly dues, enrollment fees)
 
+Commands:
+
+- "Confirm Service Commitment" by "Sales specialist" Actor
+- "Accept terms and conditions" by "Potential Customer" Actor
+
 Events:
 
 - "Contract Prepared" event once all policies are met

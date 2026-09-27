@@ -116,7 +116,6 @@ export class Money {
 		}
 
 		const paddedFrac = fracPart.padEnd(minorUnits, "0");
-		const factor = 10 ** minorUnits;
 		const amountMinorStr = (intPart || "0") + (minorUnits ? paddedFrac : "");
 		const parsed = Number(amountMinorStr);
 		if (!Number.isSafeInteger(parsed))
