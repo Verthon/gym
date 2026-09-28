@@ -4,17 +4,15 @@ An event is an immutable fact from the past, named in past tense (`ContractSigne
 
 ## Every event carries
 
-| Field           | Purpose                                              |
-| --------------- | ---------------------------------------------------- |
-| `id`            | Unique; identifies this exact occurrence (retries)   |
-| `type`          | Unique string literal                                |
-| `occurredAt`    | When it happened                                     |
-| `sourceId`      | Which domain object emitted it                       |
-| `causationId`   | ID of the command that caused it                     |
-| `correlationId` | Shared by all events resulting from one command      |
-| `payload`       | Event data                                           |
+| Field        | Purpose               |
+| ------------ | --------------------- |
+| `type`       | Unique string literal |
+| `occurredAt` | When it happened      |
+| `payload`    | Event data            |
 
 All fields are `readonly`.
+
+Not yet: `id`, `sourceId`, `causationId`, `correlationId`. Add them when commands and transport exist; don't invent them before.
 
 ## Two kinds
 
