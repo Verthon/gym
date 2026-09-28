@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ActiveContract } from "../ActiveContract.mjs";
 import { success } from "@/utils/test.mjs";
+import { LocalDate } from "@/utils/LocalDate.mjs";
 import { PersonId } from "@/contracting/draft/PersonId.mjs";
 
 describe("ActiveContract", () => {
@@ -12,7 +13,7 @@ describe("ActiveContract", () => {
 
     expect(activeContract.pullEvents()).toEqual([
       {
-        occurredAt: expect.any(String),
+        occurredAt: expect.any(LocalDate),
         payload: {
           personId: {
             value: "person-123",

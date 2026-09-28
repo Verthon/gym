@@ -1,7 +1,11 @@
 import { PersonId } from "../draft/PersonId.mjs";
 import { FeeStructure } from "@/money/FeeStructure.mjs";
-import { type DomainEvent } from "@/events/event.mjs";
-import { paymentConfirmed, paymentFailed, contractActivated, toGenericEvent } from "./events.mjs";
+import {
+  paymentConfirmed,
+  paymentFailed,
+  contractActivated,
+  type SignedContractEvent,
+} from "./events.mjs";
 
 export type SignedContractProps = {
   personId: PersonId;
@@ -16,7 +20,7 @@ type SignedState =
 
 export class SignedContract {
   private props: SignedContractProps;
-  private events: DomainEvent[] = [];
+  private events: SignedContractEvent[] = [];
   private state: SignedState = { kind: "AwaitingPayment" };
 
   private constructor(props: SignedContractProps) {
@@ -31,12 +35,10 @@ export class SignedContract {
     if (this.state.kind !== "PaymentAccepted") return;
     this.state = { kind: "Active" };
     this.events.push(
-      toGenericEvent(
-        contractActivated({
-          personId: this.props.personId,
-          fees: this.props.fees,
-        })
-      )
+      contractActivated({
+        personId: this.props.personId,
+        fees: this.props.fees,
+      })
     );
   }
 
@@ -44,12 +46,10 @@ export class SignedContract {
     if (this.state.kind !== "AwaitingPayment") return;
     this.state = { kind: "PaymentAccepted", paymentRef: args.paymentRef };
     this.events.push(
-      toGenericEvent(
-        paymentConfirmed({
-          personId: this.props.personId,
-          paymentRef: args.paymentRef,
-        })
-      )
+      paymentConfirmed({
+        personId: this.props.personId,
+        paymentRef: args.paymentRef,
+      })
     );
   }
 
@@ -57,16 +57,14 @@ export class SignedContract {
     if (this.state.kind !== "AwaitingPayment") return;
     this.state = { kind: "PaymentRejected", reason: args.reason };
     this.events.push(
-      toGenericEvent(
-        paymentFailed({
-          personId: this.props.personId,
-          reason: args.reason,
-        })
-      )
+      paymentFailed({
+        personId: this.props.personId,
+        reason: args.reason,
+      })
     );
   }
 
-  public pullEvents(): DomainEvent[] {
+  public pullEvents(): SignedContractEvent[] {
     const out = this.events;
     this.events = [];
     return out;

@@ -63,14 +63,12 @@ describe("GovernmentIdInfo.create", () => {
 	});
 
 	it("accepts all permitted types", () => {
-		for (const t of ["PASSPORT", "ID_CARD", "TEST_ID"]) {
+		for (const type of ["PASSPORT", "ID_CARD", "TEST_ID"] as const) {
 			const r = GovernmentIdInfo.create({
-				type: t as "PASSPORT" | "ID_CARD" | "TEST_ID",
+				type,
 				number: "N11322323",
 				country: "PL",
 			});
-			// NOTE: above `as` can be avoided by inlining; instead do:
-			// unwrap(GovernmentIdInfo.create({ type: 'PASSPORT', number: 'N11322323', country: 'PL' })); etc.
 			expect(r.success).toBe(true);
 		}
 	});

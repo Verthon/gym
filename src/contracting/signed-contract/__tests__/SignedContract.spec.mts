@@ -6,6 +6,7 @@ import { MonthlyDues } from "@/money/MonthlyDues.mjs";
 import { Money } from "@/money/Money.mjs";
 import { EnrollmentFee } from "@/money/EnrollmentFee.mjs";
 import { success } from "@/utils/test.mjs";
+import { LocalDate } from "@/utils/LocalDate.mjs";
 
 describe("SignedContract - success paths", () => {
     it("records accepted payment and transitions to active contract", () => {
@@ -24,7 +25,7 @@ describe("SignedContract - success paths", () => {
         const eventsAfterPayment = signedContract.pullEvents();
         expect(eventsAfterPayment).toEqual([
             {
-                occurredAt: expect.any(String),
+                occurredAt: expect.any(LocalDate),
                 payload: {
                     personId: {
                         value: "person-123",
@@ -40,7 +41,7 @@ describe("SignedContract - success paths", () => {
         const eventsAfterActivation = signedContract.pullEvents();
         expect(eventsAfterActivation).toEqual([
             {
-                occurredAt: expect.any(String),
+                occurredAt: expect.any(LocalDate),
                 payload: {
                     personId: {
                         value: "person-123",
@@ -70,7 +71,7 @@ describe("SignedContract - success paths", () => {
 
         expect(signedContract.pullEvents()).toEqual([
             {
-                occurredAt: expect.any(String),
+                occurredAt: expect.any(LocalDate),
                 payload: {
                     personId: {
                         value: "person-456",

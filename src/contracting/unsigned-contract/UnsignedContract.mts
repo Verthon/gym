@@ -2,8 +2,7 @@ import type { LocalDate } from "@/utils/LocalDate.mjs";
 import { err, okVoid, type Result } from "@/utils/Result.mjs";
 import type { PersonId } from "../draft/PersonId.mjs";
 import type { FeeStructure } from "@/money/FeeStructure.mjs";
-import type { DomainEvent } from "@/events/event.mjs";
-import { contractSigned, toGenericEvent } from "./events.mjs";
+import { contractSigned, type ContractSigned } from "./events.mjs";
 
 type UnsignedState =
   | { kind: "Pending" }
@@ -19,7 +18,7 @@ type UnsignedContractProps = {
 export class UnsignedContract {
   private props: UnsignedContractProps;
   private state: UnsignedState = { kind: "Pending" };
-  private events: DomainEvent[] = [];
+  private events: ContractSigned[] = [];
 
   private constructor(props: UnsignedContractProps) {
     this.props = props;
@@ -39,14 +38,12 @@ export class UnsignedContract {
       case "AcceptedByCustomer":
         this.state = { kind: "Signed", at };
         this.events.push(
-          toGenericEvent(
-            contractSigned(
-              {
-                personId: this.props.personId,
-                fees: this.props.fees,
-              },
-              at
-            )
+          contractSigned(
+            {
+              personId: this.props.personId,
+              fees: this.props.fees,
+            },
+            at
           )
         );
         return okVoid();
@@ -76,21 +73,19 @@ export class UnsignedContract {
     }
 
     this.events.push(
-      toGenericEvent(
-        contractSigned(
-          {
-            personId: this.props.personId,
-            fees: this.props.fees,
-          },
-          this.state.at
-        )
+      contractSigned(
+        {
+          personId: this.props.personId,
+          fees: this.props.fees,
+        },
+        this.state.at
       )
     );
 
     return okVoid();
   }
 
-  public pullEvents(): DomainEvent[] {
+  public pullEvents(): ContractSigned[] {
     const out = this.events;
     this.events = [];
     return out;

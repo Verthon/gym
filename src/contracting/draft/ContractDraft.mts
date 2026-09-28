@@ -4,8 +4,7 @@ import type { BirthDate } from "./BirthDate.mjs";
 import type { GuardianCoSignature } from "./GuardianCoSignature.mjs";
 import type { PersonId } from "./PersonId.mjs";
 import type { FeeStructure } from "@/money/FeeStructure.mjs";
-import type { DomainEvent } from "@/events/event.mjs";
-import { contractPrepared, toGenericEvent } from "./events.mjs";
+import { contractPrepared, type ContractPrepared } from "./events.mjs";
 import { okVoid } from "@/utils/Result.mjs";
 
 type DraftStatus = "Draft" | "ReadyToSign";
@@ -33,7 +32,7 @@ export type ContractDraftError =
 export class ContractDraft {
   private _props: ContractDraftProps;
   private _status: DraftStatus;
-  private _events: DomainEvent[] = [];
+  private _events: ContractPrepared[] = [];
 
   private constructor(props: ContractDraftProps) {
     this._props = props;
@@ -80,12 +79,10 @@ export class ContractDraft {
 
     this._status = "ReadyToSign";
     this._events.push(
-      toGenericEvent(
-        contractPrepared({
-          personId: this._props.userInfo.personId,
-          fees: this._props.offer.fees,
-        })
-      )
+      contractPrepared({
+        personId: this._props.userInfo.personId,
+        fees: this._props.offer.fees,
+      })
     );
 
     return okVoid();
@@ -101,7 +98,7 @@ export class ContractDraft {
     return this._props.userInfo.personId;
   }
 
-  public pullEvents(): DomainEvent[] {
+  public pullEvents(): ContractPrepared[] {
     const out = this._events;
     this._events = [];
     return out;

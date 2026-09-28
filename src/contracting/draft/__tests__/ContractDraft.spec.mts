@@ -89,7 +89,7 @@ describe("ContractDraft - success paths", () => {
     });
     expect(draft.pullEvents()).toEqual([
       {
-        occurredAt: "2025-09-13",
+        occurredAt: LocalDate.fromISO("2025-09-13"),
         payload: {
           fees: {
             enrollmentFee: {

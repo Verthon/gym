@@ -2,24 +2,17 @@ import type { ContractDraft } from "./ContractDraft.mjs";
 
 export interface ContractDraftRepository {
   get(id: string): Promise<ContractDraft | null>;
-  save(
-    id: string,
-    draft: ContractDraft,
-    expectedVersion?: number
-  ): Promise<void>;
+  save(id: string, draft: ContractDraft): Promise<void>;
 }
 
 export class InMemoryContractDraftRepository
   implements ContractDraftRepository
 {
-  private store = new Map<string, { agg: ContractDraft; version: number }>();
+  private store = new Map<string, ContractDraft>();
   async get(id: string) {
-    return this.store.get(id)?.agg ?? null;
+    return this.store.get(id) ?? null;
   }
-  async save(id: string, draft: ContractDraft, expectedVersion?: number) {
-    const v = this.store.get(id)?.version ?? 0;
-    if (expectedVersion !== undefined && expectedVersion !== v)
-      throw new Error("CONCURRENCY");
-    this.store.set(id, { agg: draft, version: v + 1 });
+  async save(id: string, draft: ContractDraft) {
+    this.store.set(id, draft);
   }
 }

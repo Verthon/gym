@@ -1,14 +1,13 @@
 import { PersonId } from "../draft/PersonId.mjs";
-import { type DomainEvent } from "@/events/event.mjs";
-import { contractSuspended, toGenericEvent } from "./events.mjs";
+import { contractSuspended, type ContractSuspended } from "./events.mjs";
 
 export type ActiveContractProps = {
   personId: PersonId;
 };
 
 export class ActiveContract {
-  private props: ActiveContractProps;
-  private events: DomainEvent[] = [];
+  private readonly props: ActiveContractProps;
+  private events: ContractSuspended[] = [];
 
   private constructor(props: ActiveContractProps) {
     this.props = props;
@@ -20,15 +19,13 @@ export class ActiveContract {
 
   public suspend() {
     this.events.push(
-      toGenericEvent(
-        contractSuspended({
-          personId: this.props.personId,
-        })
-      )
+      contractSuspended({
+        personId: this.props.personId,
+      })
     );
   }
 
-  public pullEvents(): DomainEvent[] {
+  public pullEvents(): ContractSuspended[] {
     const out = this.events;
     this.events = [];
     return out;

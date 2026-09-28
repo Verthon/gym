@@ -21,7 +21,7 @@
     "test:unit": "vitest run",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "check": "pnpm lint && pnpm type-check && pnpm test",
+    "check": "pnpm lint && pnpm type-check && pnpm run test:unit",
     "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {

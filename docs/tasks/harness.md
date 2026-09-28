@@ -6,10 +6,9 @@ Audit date: 2026-09-27
 
 - [x] Git hooks via `core.hooksPath` (`.githooks/`, activated by `prepare` on `pnpm install`)
   - [x] `pre-commit`: `pnpm lint` + `pnpm type-check`
-  - [x] `pre-push`: `pnpm test`
-- [x] `pnpm check` runs lint → type-check → test
-- [x] `pnpm test` alias (agents guess it)
-- [ ] Fix `ContractDraftService.mts:13` — `DomainEventPublisher` undefined; blocks every commit until resolved
+  - [x] `pre-push`: `pnpm run test:unit`
+- [x] `pnpm check` runs lint → type-check → `test:unit` (bare `pnpm test` with no `test` script exits 0 without running anything)
+- [x] Fix `ContractDraftService.mts:13` — `DomainEventPublisher` undefined (resolved by event-publisher changes)
 - [ ] CI workflow (`.github/workflows/check.yml`) running `pnpm check` on push/PR — hooks are bypassable with `--no-verify`
 - [ ] Claude Code Stop hook in `.claude/settings.json` running `pnpm check`, so the agent can't finish on a red tree
 - [ ] Vitest `typecheck` or keep type-check separate — note tests pass while `tsc` fails
@@ -41,7 +40,7 @@ Audit date: 2026-09-27
 ## 4. Tests
 
 - [ ] `Money` (parsing, precision, overflow, negative, arithmetic)
-- [ ] `LocalDate`, `Result`, `events/publisher`
+- [ ] `LocalDate`, `Result`
 - [ ] `EnrollmentFee`, `MonthlyDues`, `PenaltyFee`
 - [ ] Coverage reporting (`@vitest/coverage-v8`) with a threshold
 

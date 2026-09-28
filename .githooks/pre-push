@@ -5,4 +5,4 @@ if ! command -v pnpm >/dev/null 2>&1; then
   echo "Fix the environment so pnpm resolves. Do NOT bypass this hook with --no-verify or by changing core.hooksPath." >&2
   exit 1
 fi
-pnpm -s test
+pnpm run test:unit
