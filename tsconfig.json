@@ -1,20 +1,30 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "es2025",
+    "lib": ["es2025"],
     "module": "NodeNext",
-    "strict": true,
+    "moduleDetection": "force",
+    "noEmit": true,
     "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
     "skipLibCheck": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
 
-    /* If your code doesn't run in the DOM: */
-    "lib": ["es2022"],
     "paths": {
       "@/*": ["./src/*"]
     },
 
-    /* Vitest Options */
     "types": ["node", "vitest/globals"]
   },
   "exclude": ["node_modules", "vitest.config.mts", "oxlint.config.mts"]
