@@ -27,7 +27,7 @@ A first version of the coder agent (agy, Gemini default model) and the skills it
 ## Skills to write (initial versions)
 
 1. `implement-spec`: the coder's main loop. Read the spec and locked tests, then the repo map, then implement bottom-up (VO → entity → events → repository → service), then run `pnpm check`. Stop conditions: a locked file is wrong, a failure can't be fixed inside the allowed paths, or the same check fails N times in a row with the same error. Report format: what's done, check status, defect with file:line, proposed fixes.
-2. `unit-tests-below-seam`: tests cover what acceptance tests don't (edge cases, port failures, invariants, event shape). Never restate an AC. Assert `Result`s in setup. Use `@/utils/test.mjs`. Use a recording fake when persistence matters.
+2. `unit-tests-below-seam`: tests cover what acceptance tests don't (edge cases, port failures, invariants, event shape). Never restate an AC. Assert `Result`s in setup. Use `#/utils/test.mts`. Use a recording fake when persistence matters.
 3. `repo-map`: short index of where things live and which reference implementation to copy per building block. Could be the new `AGENTS.md` instead of a skill.
 4. Spec-author side (Claude): `to-spec` from P1 Next 4, plus a lock gate. Acceptance tests must pass `pnpm lint` and fail only on missing modules before hashing.
 

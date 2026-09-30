@@ -1,5 +1,5 @@
-import { Money } from "./Money.mjs";
-import { err } from "@/utils/Result.mjs";
+import { Money } from "./Money.mts";
+import { err } from "#/utils/Result.mts";
 
 export type PenaltyFeeError =
 	| { code: "ZERO_OR_NEGATIVE"; context: { amount: string } }

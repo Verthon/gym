@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 
-import { PersonId } from "../PersonId.mjs";
-import { unwrap } from "@/utils/test.mjs";
+import { PersonId } from "../PersonId.mts";
+import { unwrap } from "#/utils/test.mts";
 
 describe("PersonId.create", () => {
 	it("creates from trimmed non-empty string with length >= 3", () => {

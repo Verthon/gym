@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import { BirthDate } from "../BirthDate.mjs";
-import { unwrap } from "@/utils/test.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import { BirthDate } from "../BirthDate.mts";
+import { unwrap } from "#/utils/test.mts";
 
 describe("BirthDate.create", () => {
 	it("accepts today or any past date", () => {

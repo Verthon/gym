@@ -1,5 +1,5 @@
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import type { PersonId } from "../draft/PersonId.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import type { PersonId } from "../draft/PersonId.mts";
 
 export type ContractSuspended = Readonly<{
   type: "ContractSuspended";

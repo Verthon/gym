@@ -1,5 +1,5 @@
-import { PersonId } from "../draft/PersonId.mjs";
-import { contractSuspended, type ContractSuspended } from "./events.mjs";
+import { PersonId } from "../draft/PersonId.mts";
+import { contractSuspended, type ContractSuspended } from "./events.mts";
 
 export type ActiveContractProps = {
   personId: PersonId;

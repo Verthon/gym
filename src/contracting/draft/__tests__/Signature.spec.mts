@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import { PersonId } from "../PersonId.mjs";
-import { Signature } from "../Signature.mjs";
-import { unwrap } from "@/utils/test.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import { PersonId } from "../PersonId.mts";
+import { Signature } from "../Signature.mts";
+import { unwrap } from "#/utils/test.mts";
 
 describe("Signature.create", () => {
 	it("creates when signer and date present", () => {

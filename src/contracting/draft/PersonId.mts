@@ -1,3 +1,5 @@
+import { err, ok, type Result } from "#/utils/Result.mts";
+
 export type PersonIdError =
 	| { code: "EMPTY" }
 	| { code: "TOO_SHORT"; context: { value: string } };
@@ -9,19 +11,11 @@ export class PersonId {
 		this.value = value;
 	}
 
-	static create(
-		input: string | null | undefined
-	):
-		| { success: true; value: PersonId }
-		| { success: false; error: PersonIdError } {
-		if (!input) return { success: false, error: { code: "EMPTY" } };
+	static create(input: string | null | undefined): Result<PersonId, PersonIdError> {
+		if (!input) return err({ code: "EMPTY" });
 		const v = input.trim();
-		if (v.length < 3)
-			return {
-				success: false,
-				error: { code: "TOO_SHORT", context: { value: input } },
-			};
-		return { success: true, value: new PersonId(v) };
+		if (v.length < 3) return err({ code: "TOO_SHORT", context: { value: input } });
+		return ok(new PersonId(v));
 	}
 
 	public equals(other: PersonId): boolean {

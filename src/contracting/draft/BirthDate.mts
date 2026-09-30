@@ -1,4 +1,4 @@
-import { LocalDate } from "@/utils/LocalDate.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
 
 type BirthDateError = { code: "IN_FUTURE"; context: { birthDate: LocalDate } };
 

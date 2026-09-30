@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import { PersonId } from "../PersonId.mjs";
-import { GuardianCoSignature } from "../GuardianCoSignature.mjs";
-import { unwrap } from "@/utils/test.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import { PersonId } from "../PersonId.mts";
+import { GuardianCoSignature } from "../GuardianCoSignature.mts";
+import { unwrap } from "#/utils/test.mts";
 
 describe("GuardianCoSignature.create", () => {
 	it("creates when guardian, minor, and date are valid and distinct", () => {

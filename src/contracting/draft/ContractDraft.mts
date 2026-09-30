@@ -1,11 +1,11 @@
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import type { GovernmentIdInfo } from "./GovernmentIdInfo.mjs";
-import type { BirthDate } from "./BirthDate.mjs";
-import type { GuardianCoSignature } from "./GuardianCoSignature.mjs";
-import type { PersonId } from "./PersonId.mjs";
-import type { FeeStructure } from "@/money/FeeStructure.mjs";
-import { contractPrepared, type ContractPrepared } from "./events.mjs";
-import { okVoid } from "@/utils/Result.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import type { GovernmentIdInfo } from "./GovernmentIdInfo.mts";
+import type { BirthDate } from "./BirthDate.mts";
+import type { GuardianCoSignature } from "./GuardianCoSignature.mts";
+import type { PersonId } from "./PersonId.mts";
+import type { FeeStructure } from "#/money/FeeStructure.mts";
+import { contractPrepared, type ContractPrepared } from "./events.mts";
+import { okVoid } from "#/utils/Result.mts";
 
 type DraftStatus = "Draft" | "ReadyToSign";
 export type ContractDraftProps = {

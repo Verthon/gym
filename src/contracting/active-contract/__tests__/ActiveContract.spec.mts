@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { ActiveContract } from "../ActiveContract.mjs";
-import { success } from "@/utils/test.mjs";
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import { PersonId } from "@/contracting/draft/PersonId.mjs";
+import { ActiveContract } from "../ActiveContract.mts";
+import { success } from "#/utils/test.mts";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import { PersonId } from "#/contracting/draft/PersonId.mts";
 
 describe("ActiveContract", () => {
   it("dispatches a ContractSuspended event when suspended", () => {

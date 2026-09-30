@@ -1,4 +1,4 @@
-import { LocalDate } from "@/utils/LocalDate.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
 
 type GovernmentIdType = "PASSPORT" | "ID_CARD" | "TEST_ID";
 

@@ -1,8 +1,8 @@
-import type { LocalDate } from "@/utils/LocalDate.mjs";
-import { err, okVoid, type Result } from "@/utils/Result.mjs";
-import type { PersonId } from "../draft/PersonId.mjs";
-import type { FeeStructure } from "@/money/FeeStructure.mjs";
-import { contractSigned, type ContractSigned } from "./events.mjs";
+import type { LocalDate } from "#/utils/LocalDate.mts";
+import { err, okVoid, type Result } from "#/utils/Result.mts";
+import type { PersonId } from "../draft/PersonId.mts";
+import type { FeeStructure } from "#/money/FeeStructure.mts";
+import { contractSigned, type ContractSigned } from "./events.mts";
 
 type UnsignedState =
   | { kind: "Pending" }

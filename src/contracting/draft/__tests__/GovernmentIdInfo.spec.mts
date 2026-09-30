@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import { GovernmentIdInfo } from "../GovernmentIdInfo.mjs";
-import { unwrap } from "@/utils/test.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import { GovernmentIdInfo } from "../GovernmentIdInfo.mts";
+import { unwrap } from "#/utils/test.mts";
 
 describe("GovernmentIdInfo.create", () => {
 	it("creates a valid ID without expiry", () => {

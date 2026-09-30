@@ -1,6 +1,6 @@
-import type { FeeStructure } from "@/money/FeeStructure.mjs";
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import type { PersonId } from "../draft/PersonId.mjs";
+import type { FeeStructure } from "#/money/FeeStructure.mts";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import type { PersonId } from "../draft/PersonId.mts";
 
 export type PaymentConfirmed = Readonly<{
     type: "PaymentConfirmed";

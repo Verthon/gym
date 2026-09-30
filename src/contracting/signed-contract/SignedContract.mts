@@ -1,11 +1,11 @@
-import { PersonId } from "../draft/PersonId.mjs";
-import { FeeStructure } from "@/money/FeeStructure.mjs";
+import { PersonId } from "../draft/PersonId.mts";
+import { FeeStructure } from "#/money/FeeStructure.mts";
 import {
   paymentConfirmed,
   paymentFailed,
   contractActivated,
   type SignedContractEvent,
-} from "./events.mjs";
+} from "./events.mts";
 
 export type SignedContractProps = {
   personId: PersonId;

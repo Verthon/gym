@@ -5,6 +5,7 @@
     "module": "NodeNext",
     "moduleDetection": "force",
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "erasableSyntaxOnly": true,
     "skipLibCheck": true,
@@ -20,10 +21,6 @@
 
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-
-    "paths": {
-      "@/*": ["./src/*"]
-    },
 
     "types": ["node", "vitest/globals"]
   },

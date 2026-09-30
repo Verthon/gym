@@ -1,5 +1,5 @@
-import { Money } from "./Money.mjs";
-import { err } from "@/utils/Result.mjs";
+import { Money } from "./Money.mts";
+import { err } from "#/utils/Result.mts";
 
 export type EnrollmentFeeError =
 	| { code: "NEGATIVE_AMOUNT"; context: { amount: string } }

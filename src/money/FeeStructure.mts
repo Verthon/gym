@@ -1,7 +1,7 @@
-import type { EnrollmentFee } from "./EnrollmentFee.mjs";
-import { Money, type MoneyError } from "./Money.mjs";
-import type { MonthlyDues } from "./MonthlyDues.mjs";
-import type { PenaltyFee } from "./PenaltyFee.mjs";
+import type { EnrollmentFee } from "./EnrollmentFee.mts";
+import { Money, type MoneyError } from "./Money.mts";
+import type { MonthlyDues } from "./MonthlyDues.mts";
+import type { PenaltyFee } from "./PenaltyFee.mts";
 
 export type FeeStructureError = {
 	code: "CURRENCY_MISMATCH";

@@ -1,4 +1,4 @@
-import type { ContractDraft } from "./ContractDraft.mjs";
+import type { ContractDraft } from "./ContractDraft.mts";
 
 export interface ContractDraftRepository {
   get(id: string): Promise<ContractDraft | null>;

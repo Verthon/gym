@@ -1,6 +1,6 @@
-import type { FeeStructure } from "@/money/FeeStructure.mjs";
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import type { PersonId } from "./PersonId.mjs";
+import type { FeeStructure } from "#/money/FeeStructure.mts";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import type { PersonId } from "./PersonId.mts";
 
 /** Internal BC event (can use VO + LocalDate) */
 export type ContractPrepared = Readonly<{

@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 
-import { failWith, success } from "@/utils/test.mjs";
-import { Money } from "../Money.mjs";
-import { EnrollmentFee } from "../EnrollmentFee.mjs";
-import { FeeStructure } from "../FeeStructure.mjs";
-import { MonthlyDues } from "../MonthlyDues.mjs";
-import { PenaltyFee } from "../PenaltyFee.mjs";
+import { failWith, success } from "#/utils/test.mts";
+import { Money } from "../Money.mts";
+import { EnrollmentFee } from "../EnrollmentFee.mts";
+import { FeeStructure } from "../FeeStructure.mts";
+import { MonthlyDues } from "../MonthlyDues.mts";
+import { PenaltyFee } from "../PenaltyFee.mts";
 
 const EUR = (x: string) => success(Money.fromMajor(x, "EUR"));
 

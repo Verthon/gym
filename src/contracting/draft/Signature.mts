@@ -1,5 +1,5 @@
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import type { PersonId } from "./PersonId.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import type { PersonId } from "./PersonId.mts";
 
 export type SignatureError =
 	| { code: "MISSING_SIGNER" }

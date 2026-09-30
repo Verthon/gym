@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-import { UnsignedContract } from "../UnsignedContract.mjs";
-import { PersonId } from "../../draft/PersonId.mjs";
-import { failWith, success } from "@/utils/test.mjs";
-import { FeeStructure } from "@/money/FeeStructure.mjs";
-import { MonthlyDues } from "@/money/MonthlyDues.mjs";
-import { Money } from "@/money/Money.mjs";
-import { EnrollmentFee } from "@/money/EnrollmentFee.mjs";
-import { LocalDate } from "@/utils/LocalDate.mjs";
+import { UnsignedContract } from "../UnsignedContract.mts";
+import { PersonId } from "../../draft/PersonId.mts";
+import { failWith, success } from "#/utils/test.mts";
+import { FeeStructure } from "#/money/FeeStructure.mts";
+import { MonthlyDues } from "#/money/MonthlyDues.mts";
+import { Money } from "#/money/Money.mts";
+import { EnrollmentFee } from "#/money/EnrollmentFee.mts";
+import { LocalDate } from "#/utils/LocalDate.mts";
 
 const applicantId = success(PersonId.create("applicant-1"));
 const monthly = success(

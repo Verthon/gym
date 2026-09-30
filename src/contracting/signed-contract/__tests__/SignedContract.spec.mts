@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { PersonId } from "../../draft/PersonId.mjs";
-import { SignedContract } from "../SignedContract.mjs";
-import { FeeStructure } from "@/money/FeeStructure.mjs";
-import { MonthlyDues } from "@/money/MonthlyDues.mjs";
-import { Money } from "@/money/Money.mjs";
-import { EnrollmentFee } from "@/money/EnrollmentFee.mjs";
-import { success } from "@/utils/test.mjs";
-import { LocalDate } from "@/utils/LocalDate.mjs";
+import { PersonId } from "../../draft/PersonId.mts";
+import { SignedContract } from "../SignedContract.mts";
+import { FeeStructure } from "#/money/FeeStructure.mts";
+import { MonthlyDues } from "#/money/MonthlyDues.mts";
+import { Money } from "#/money/Money.mts";
+import { EnrollmentFee } from "#/money/EnrollmentFee.mts";
+import { success } from "#/utils/test.mts";
+import { LocalDate } from "#/utils/LocalDate.mts";
 
 describe("SignedContract - success paths", () => {
     it("records accepted payment and transitions to active contract", () => {

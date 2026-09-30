@@ -1,16 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-import { LocalDate } from "@/utils/LocalDate.mjs";
-import { failWith, success } from "@/utils/test.mjs";
-import { BirthDate } from "../BirthDate.mjs";
-import { ContractDraft } from "../ContractDraft.mjs";
-import { GovernmentIdInfo } from "../GovernmentIdInfo.mjs";
-import { GuardianCoSignature } from "../GuardianCoSignature.mjs";
-import { PersonId } from "../PersonId.mjs";
-import { Money } from "@/money/Money.mjs";
-import { EnrollmentFee } from "@/money/EnrollmentFee.mjs";
-import { MonthlyDues } from "@/money/MonthlyDues.mjs";
-import { FeeStructure } from "@/money/FeeStructure.mjs";
+import { LocalDate } from "#/utils/LocalDate.mts";
+import { failWith, success } from "#/utils/test.mts";
+import { BirthDate } from "../BirthDate.mts";
+import { ContractDraft } from "../ContractDraft.mts";
+import { GovernmentIdInfo } from "../GovernmentIdInfo.mts";
+import { GuardianCoSignature } from "../GuardianCoSignature.mts";
+import { PersonId } from "../PersonId.mts";
+import { Money } from "#/money/Money.mts";
+import { EnrollmentFee } from "#/money/EnrollmentFee.mts";
+import { MonthlyDues } from "#/money/MonthlyDues.mts";
+import { FeeStructure } from "#/money/FeeStructure.mts";
 
 describe("ContractDraft - success paths", () => {
   beforeEach(() => {
