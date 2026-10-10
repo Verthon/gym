@@ -12,6 +12,17 @@ describe("Clock.system", () => {
 		expect(Temporal.Instant.compare(read, after)).toBeLessThanOrEqual(0);
 		expect(clock.timeZone).toBe("Europe/Warsaw");
 	});
+
+	it("normalizes the case of a region time zone", () => {
+		expect(Clock.system("europe/lisbon").timeZone).toBe("Europe/Lisbon");
+	});
+
+	it.each(["+01:00", "CET", "UTC", "Etc/GMT-1", "Mars/Base", ""])(
+		"rejects %j because it is not an IANA region time zone",
+		(zone) => {
+			expect(() => Clock.system(zone)).toThrow(RangeError);
+		}
+	);
 });
 
 describe("Clock.fixed", () => {

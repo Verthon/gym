@@ -2,6 +2,7 @@
 
 - Date: 2026-09-30
 - Status: Proposed
+- Superseded in part by: [0002](0002-node-26-temporal-and-injected-clock.md) replaces the Node 24 floor.
 
 ## 1. Circumstances
 
