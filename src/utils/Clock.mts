@@ -3,6 +3,8 @@ export type Clock = Readonly<{
 	timeZone: string;
 }>;
 
+const GYM_TIME_ZONE = "GYM_TIME_ZONE";
+
 const regionTimeZone = (input: string): string => {
 	const id = Temporal.Now.zonedDateTimeISO(input).timeZoneId;
 	if (!id.includes("/") || id.startsWith("Etc/")) {
@@ -13,16 +15,29 @@ const regionTimeZone = (input: string): string => {
 	return id;
 };
 
+const gymTimeZone = (): string => {
+	const zone = process.env[GYM_TIME_ZONE];
+	if (zone === undefined) throw new Error(`${GYM_TIME_ZONE} is not set`);
+	return zone;
+};
+
 export const Clock = {
-	system: (timeZone: string): Clock => {
+	system: (timeZone: string = gymTimeZone()): Clock => {
 		const zone = regionTimeZone(timeZone);
 		return {
 			instant: () => Temporal.Now.instant(),
 			timeZone: zone,
 		};
 	},
-	fixed: (instant: Temporal.Instant, timeZone: string): Clock => ({
-		instant: () => instant,
-		timeZone,
-	}),
+	fixed: (
+		at: Temporal.Instant | string,
+		timeZone: string = gymTimeZone()
+	): Clock => {
+		const instant = Temporal.Instant.from(at);
+		const zone = regionTimeZone(timeZone);
+		return {
+			instant: () => instant,
+			timeZone: zone,
+		};
+	},
 };

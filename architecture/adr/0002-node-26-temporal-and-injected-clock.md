@@ -31,7 +31,7 @@ VOs and event factories called `LocalDate.today()` directly.
 ### Measure
 - Five repeated `pnpm test:unit` runs give the same result.
 - Two `pnpm mutation --force` runs give the same killed and survived counts.
-- Outside `src/utils/Clock.mts`, no file in `src/` reads `Temporal.Now` or `new Date()`. Only application services call `LocalDate.today(clock)`.
+- Outside `src/utils/Clock.mts`, no file in `src/` reads `Temporal.Now`, `new Date()` or `GYM_TIME_ZONE`. Only application services call `LocalDate.today(clock)`.
 
 ## 3. Decision
 
@@ -41,11 +41,13 @@ Move to Node 26 and use native `Temporal` for business dates.
 - `.nvmrc` and `devEngines.runtime` pin Node 26.11.1. `engines.node` is `>=26.0.0`.
 - `tsconfig.json` adds `esnext.temporal` to `lib`.
 - `LocalDate` wraps `Temporal.PlainDate`. It has no time of day.
-- `Clock` gives `instant(): Temporal.Instant` and a `timeZone`. `Clock.system(zone)` reads the system time. `Clock.fixed(instant, zone)` is for tests.
+- `Clock` gives `instant(): Temporal.Instant` and a `timeZone`. `Clock.system()` reads the system time. `Clock.fixed(at)` is for tests.
 - Only application services read the clock: `LocalDate.today(deps.clock)`. Domain code receives the date as `asOf` or `at`.
 - Event factories require `occurredAt`. They do not read the clock.
 - The business time zone is one IANA region zone per deployment, from the env var `GYM_TIME_ZONE` (for example `Europe/Warsaw`).
-- `Clock.system` rejects offsets, `Etc/*` zones and abbreviations such as `CET`.
+- `Clock` reads `GYM_TIME_ZONE` when the caller gives no zone. No other code reads it.
+- A test can give an explicit zone, or change `GYM_TIME_ZONE` with `vi.stubEnv`. `vitest.config.mts` sets it to `Europe/Warsaw`.
+- `Clock` rejects offsets, `Etc/*` zones and abbreviations such as `CET`.
 - `date-fns` is removed.
 
 **Why:** `PlainDate` makes every comparison a date comparison, so equal dates cannot compare as before or after. An injected clock makes "today" an input, so tests set it and do not race it. A region zone keeps the correct local date through summer time and through future rule changes. The domain stays free of time zones and of the system clock.
@@ -75,14 +77,14 @@ Move to Node 26 and use native `Temporal` for business dates.
 ## 4. Consequences
 
 ### Positive
-- Test determinism: specs use a fixed date. Five repeated runs gave 53/53 each time.
+- Test determinism: specs use a fixed date, and tests do not depend on the machine time zone. Five repeated runs gave 53/53 each time.
 - Correctness of business-date rules: `ContractPrepared.occurredAt` now equals the `asOf` of the use case.
 
 ### Trade-offs
 - Behaviours and VO factories take one more parameter (`asOf` or `at`).
 - The deploy needs Node 26 and the `GYM_TIME_ZONE` env var.
 - Node 26 is "Current", not LTS, until 2026-10-28.
-- The composition root does not read `GYM_TIME_ZONE` yet. The first use-case wiring must add it.
+- No composition root calls `Clock.system()` yet. A missing `GYM_TIME_ZONE` fails only when the first use case is wired.
 
 ## 5. Evidence
 - Probe: oxlint, tsc 7.0.2, vitest 3.2.4, knip 6.38, Stryker 10, tsx and hono ran on Node 26.11.1.

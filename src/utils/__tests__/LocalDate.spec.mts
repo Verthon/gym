@@ -3,22 +3,20 @@ import { describe, it, expect } from "vitest";
 import { Clock } from "../Clock.mts";
 import { LocalDate } from "../LocalDate.mts";
 
-const at = (iso: string) => Temporal.Instant.from(iso);
-
 describe("LocalDate.today", () => {
 	it("is the calendar date of the clock's instant in the clock's zone", () => {
-		const instant = at("2025-09-12T22:30:00Z");
+		const instant = "2025-09-12T22:30:00Z";
 		expect(LocalDate.today(Clock.fixed(instant, "Europe/Warsaw")).toISO()).toBe(
 			"2025-09-13"
 		);
-		expect(LocalDate.today(Clock.fixed(instant, "UTC")).toISO()).toBe(
+		expect(LocalDate.today(Clock.fixed(instant, "Europe/Lisbon")).toISO()).toBe(
 			"2025-09-12"
 		);
 	});
 
 	it("is equal for two instants on the same day", () => {
-		const morning = Clock.fixed(at("2025-09-13T06:00:00Z"), "Europe/Warsaw");
-		const evening = Clock.fixed(at("2025-09-13T20:00:00Z"), "Europe/Warsaw");
+		const morning = Clock.fixed("2025-09-13T06:00:00Z");
+		const evening = Clock.fixed("2025-09-13T20:00:00Z");
 		const a = LocalDate.today(morning);
 		const b = LocalDate.today(evening);
 		expect(a.equals(b)).toBe(true);
