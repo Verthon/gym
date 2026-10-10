@@ -39,7 +39,7 @@
   "devDependencies": {
     "@stryker-mutator/core": "10.0.0",
     "@stryker-mutator/vitest-runner": "10.0.0",
-    "@types/node": "26.6.5",
+    "@types/node": "26.6.4",
     "knip": "6.38.0",
     "oxlint": "1.85.0",
     "oxlint-tsgolint": "7.0.2003",
