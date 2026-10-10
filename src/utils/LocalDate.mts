@@ -1,4 +1,8 @@
-import { parseISO, isBefore, addDays, format, isAfter } from "date-fns";
+import { addDays } from "date-fns/addDays";
+import { format } from "date-fns/format";
+import { isAfter } from "date-fns/isAfter";
+import { isBefore } from "date-fns/isBefore";
+import { parseISO } from "date-fns/parseISO";
 
 // Simple, explicit LocalDate value object—never expose JS Date in domain.
 export class LocalDate {

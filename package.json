@@ -26,6 +26,7 @@
     "type-check": "tsc",
     "test:unit": "vitest run",
     "scan:deadcode": "knip",
+    "mutation": "stryker run",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "check": "pnpm check:no-js && pnpm lint && pnpm type-check && pnpm run test:unit",
@@ -37,6 +38,8 @@
     "hono": "4.9.8"
   },
   "devDependencies": {
+    "@stryker-mutator/core": "10.0.0",
+    "@stryker-mutator/vitest-runner": "10.0.0",
     "@types/node": "24.5.2",
     "knip": "6.38.0",
     "oxlint": "1.85.0",

@@ -28,3 +28,7 @@ lerna-debug.log*
 .DS_Store
 
 dist
+
+# stryker
+reports/
+.stryker-tmp/
