@@ -38,7 +38,7 @@ Current cross-folder imports, from `src/**/*.mts`:
 
 | From | May import |
 |---|---|
-| `src/utils` | `date-fns` only, nothing in `src/` |
+| `src/utils` | nothing outside `src/utils` (`Temporal` is a global) |
 | `src/money` | `src/utils` |
 | `src/contracting/<stage>` | own `<stage>`, `src/contracting/draft/PersonId`, `src/money`, `src/utils` |
 | `src/sandbox` | anything in `src/` |

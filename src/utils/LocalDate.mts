@@ -1,52 +1,43 @@
-import { addDays } from "date-fns/addDays";
-import { format } from "date-fns/format";
-import { isAfter } from "date-fns/isAfter";
-import { isBefore } from "date-fns/isBefore";
-import { parseISO } from "date-fns/parseISO";
+import type { Clock } from "./Clock.mts";
 
-// Simple, explicit LocalDate value object—never expose JS Date in domain.
 export class LocalDate {
-	private readonly value: Date;
+	private readonly value: Temporal.PlainDate;
 
-	private constructor(value: Date) {
+	private constructor(value: Temporal.PlainDate) {
 		this.value = value;
 	}
 
-	// Parse ISO string (YYYY-MM-DD or ISO date-time; trims to date part)
 	public static fromISO(input: string): LocalDate {
-		return new LocalDate(parseISO(input));
+		return new LocalDate(Temporal.PlainDate.from(input));
 	}
 
-	// Get today (always use this for tests/mockability later)
-	public static today(): LocalDate {
-		return new LocalDate(new Date());
+	public static today(clock: Clock): LocalDate {
+		return new LocalDate(
+			clock.instant().toZonedDateTimeISO(clock.timeZone).toPlainDate()
+		);
 	}
 
-	// Basic business comparison
 	public isBefore(other: LocalDate): boolean {
-		return isBefore(this.value, other.value);
+		return Temporal.PlainDate.compare(this.value, other.value) < 0;
 	}
 
-	public isAfter(other: LocalDate) {
-		return isAfter(this.value, other.value);
+	public isAfter(other: LocalDate): boolean {
+		return Temporal.PlainDate.compare(this.value, other.value) > 0;
 	}
 
-	// Add days (returns a new LocalDate VO)
 	public plusDays(days: number): LocalDate {
-		return new LocalDate(addDays(this.value, days));
+		return new LocalDate(this.value.add({ days }));
 	}
 
-	// Serialize to ISO date string (YYYY-MM-DD)
 	public toISO(): string {
-		return format(this.value, "yyyy-MM-dd");
+		return this.value.toString();
 	}
 
-	// For domain use: raw JS Date, if needed by infrastructure
-	public toJSDate(): Date {
-		return new Date(this.value.getTime());
+	public toPlainDate(): Temporal.PlainDate {
+		return this.value;
 	}
 
 	public equals(other: LocalDate): boolean {
-		return this.toISO() === other.toISO();
+		return this.value.equals(other.value);
 	}
 }

@@ -1,3 +1,4 @@
+import type { LocalDate } from "#/utils/LocalDate.mts";
 import { PersonId } from "../draft/PersonId.mts";
 import { contractSuspended, type ContractSuspended } from "./events.mts";
 
@@ -17,11 +18,14 @@ export class ActiveContract {
     return new ActiveContract(props);
   }
 
-  public suspend() {
+  public suspend(at: LocalDate) {
     this.events.push(
-      contractSuspended({
-        personId: this.props.personId,
-      })
+      contractSuspended(
+        {
+          personId: this.props.personId,
+        },
+        at
+      )
     );
   }
 

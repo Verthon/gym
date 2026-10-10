@@ -79,10 +79,13 @@ export class ContractDraft {
 
     this._status = "ReadyToSign";
     this._events.push(
-      contractPrepared({
-        personId: this._props.userInfo.personId,
-        fees: this._props.offer.fees,
-      })
+      contractPrepared(
+        {
+          personId: this._props.userInfo.personId,
+          fees: this._props.offer.fees,
+        },
+        asOf
+      )
     );
 
     return okVoid();

@@ -8,6 +8,8 @@ import { EnrollmentFee } from "#/money/EnrollmentFee.mts";
 import { success } from "#/utils/test.mts";
 import { LocalDate } from "#/utils/LocalDate.mts";
 
+const today = LocalDate.fromISO("2025-09-13");
+
 describe("SignedContract - success paths", () => {
     it("records accepted payment and transitions to active contract", () => {
         const personId = success(PersonId.create("person-123"));
@@ -20,12 +22,12 @@ describe("SignedContract - success paths", () => {
         const fees = success(FeeStructure.create(monthly, enrollment, []));
         const signedContract = SignedContract.create({ personId, fees });
 
-        signedContract.recordPaymentAccepted({ paymentRef: "PAY-12345" });
+        signedContract.recordPaymentAccepted({ paymentRef: "PAY-12345", at: today });
         
         const eventsAfterPayment = signedContract.pullEvents();
         expect(eventsAfterPayment).toEqual([
             {
-                occurredAt: expect.any(LocalDate),
+                occurredAt: today,
                 payload: {
                     personId: {
                         value: "person-123",
@@ -36,12 +38,12 @@ describe("SignedContract - success paths", () => {
             },
         ]);
 
-        signedContract.toActiveContract();
+        signedContract.toActiveContract(today);
         
         const eventsAfterActivation = signedContract.pullEvents();
         expect(eventsAfterActivation).toEqual([
             {
-                occurredAt: expect.any(LocalDate),
+                occurredAt: today,
                 payload: {
                     personId: {
                         value: "person-123",
@@ -67,11 +69,11 @@ describe("SignedContract - success paths", () => {
         const fees = success(FeeStructure.create(monthly, enrollment, []));
         const signedContract = SignedContract.create({ personId, fees });
 
-        signedContract.recordPaymentRejected({ reason: "Insufficient funds" });
+        signedContract.recordPaymentRejected({ reason: "Insufficient funds", at: today });
 
         expect(signedContract.pullEvents()).toEqual([
             {
-                occurredAt: expect.any(LocalDate),
+                occurredAt: today,
                 payload: {
                     personId: {
                         value: "person-456",
@@ -96,7 +98,7 @@ describe("SignedContract - validation", () => {
         const fees = success(FeeStructure.create(monthly, enrollment, []));
         const signedContract = SignedContract.create({ personId, fees });
 
-        signedContract.toActiveContract();
+        signedContract.toActiveContract(today);
 
         expect(signedContract.pullEvents()).toEqual([]);
     });
@@ -112,8 +114,8 @@ describe("SignedContract - validation", () => {
         const fees = success(FeeStructure.create(monthly, enrollment, []));
         const signedContract = SignedContract.create({ personId, fees });
 
-        signedContract.recordPaymentRejected({ reason: "Card declined" });
-        signedContract.toActiveContract();
+        signedContract.recordPaymentRejected({ reason: "Card declined", at: today });
+        signedContract.toActiveContract(today);
 
         const events = signedContract.pullEvents();
         expect(events).toHaveLength(1);

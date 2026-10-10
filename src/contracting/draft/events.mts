@@ -1,5 +1,5 @@
 import type { FeeStructure } from "#/money/FeeStructure.mts";
-import { LocalDate } from "#/utils/LocalDate.mts";
+import type { LocalDate } from "#/utils/LocalDate.mts";
 import type { PersonId } from "./PersonId.mts";
 
 /** Internal BC event (can use VO + LocalDate) */
@@ -12,10 +12,9 @@ export type ContractPrepared = Readonly<{
 	}>;
 }>;
 
-/** Factory (defaults to today) */
 export const contractPrepared = (
 	payload: ContractPrepared["payload"],
-	occurredAt: LocalDate = LocalDate.today()
+	occurredAt: LocalDate
 ): ContractPrepared => ({
 	type: "ContractPrepared",
 	occurredAt,

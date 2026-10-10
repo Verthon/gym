@@ -1,4 +1,4 @@
-import { LocalDate } from "#/utils/LocalDate.mts";
+import type { LocalDate } from "#/utils/LocalDate.mts";
 
 type GovernmentIdType = "PASSPORT" | "ID_CARD" | "TEST_ID";
 
@@ -22,7 +22,8 @@ export class GovernmentIdInfo {
 	}
 
 	public static create(
-		props: GovernmentIdInfoProps
+		props: GovernmentIdInfoProps,
+		asOf: LocalDate
 	):
 		| { success: true; value: GovernmentIdInfo }
 		| { success: false; error: GovernmentIdInfoError } {
@@ -38,7 +39,7 @@ export class GovernmentIdInfo {
 				error: { code: "INVALID_NUMBER", context: { number: props.number } },
 			};
 		}
-		if (props.expiryDate && props.expiryDate.isBefore(LocalDate.today())) {
+		if (props.expiryDate && props.expiryDate.isBefore(asOf)) {
 			return {
 				success: false,
 				error: { code: "EXPIRED", context: { expiryDate: props.expiryDate } },

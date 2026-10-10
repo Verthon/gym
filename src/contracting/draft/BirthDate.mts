@@ -1,4 +1,4 @@
-import { LocalDate } from "#/utils/LocalDate.mts";
+import type { LocalDate } from "#/utils/LocalDate.mts";
 
 type BirthDateError = { code: "IN_FUTURE"; context: { birthDate: LocalDate } };
 
@@ -10,13 +10,13 @@ export class BirthDate {
   }
 
   static create(
-    birthDate: LocalDate
+    birthDate: LocalDate,
+    asOf: LocalDate
   ):
     | { success: true; value: BirthDate }
     | { success: false; error: BirthDateError } {
-    const today = LocalDate.today();
     // Fail-fast: birth date cannot be in the future
-    if (birthDate.isAfter(today)) {
+    if (birthDate.isAfter(asOf)) {
       return {
         success: false,
         error: { code: "IN_FUTURE", context: { birthDate } },
@@ -30,12 +30,11 @@ export class BirthDate {
   }
 
   public ageAsOf(asOf: LocalDate): number {
-    const a = asOf.toJSDate();
-    const b = this.date.toJSDate();
-    let years = a.getUTCFullYear() - b.getUTCFullYear();
+    const a = asOf.toPlainDate();
+    const b = this.date.toPlainDate();
+    let years = a.year - b.year;
     const monthAhead =
-      a.getUTCMonth() > b.getUTCMonth() ||
-      (a.getUTCMonth() === b.getUTCMonth() && a.getUTCDate() >= b.getUTCDate());
+      a.month > b.month || (a.month === b.month && a.day >= b.day);
     if (!monthAhead) years--;
     return years < 0 ? 0 : years;
   }

@@ -1,5 +1,5 @@
 import type { FeeStructure } from "#/money/FeeStructure.mts";
-import { LocalDate } from "#/utils/LocalDate.mts";
+import type { LocalDate } from "#/utils/LocalDate.mts";
 import type { PersonId } from "../draft/PersonId.mts";
 
 export type PaymentConfirmed = Readonly<{
@@ -13,7 +13,7 @@ export type PaymentConfirmed = Readonly<{
 
 export const paymentConfirmed = (
     payload: PaymentConfirmed["payload"],
-    occurredAt: LocalDate = LocalDate.today()
+    occurredAt: LocalDate
 ): PaymentConfirmed => ({
     type: "PaymentConfirmed",
     occurredAt,
@@ -31,7 +31,7 @@ export type PaymentFailed = Readonly<{
 
 export const paymentFailed = (
     payload: PaymentFailed["payload"],
-    occurredAt: LocalDate = LocalDate.today()
+    occurredAt: LocalDate
 ): PaymentFailed => ({
     type: "PaymentFailed",
     occurredAt,
@@ -49,7 +49,7 @@ export type ContractActivated = Readonly<{
 
 export const contractActivated = (
     payload: ContractActivated["payload"],
-    occurredAt: LocalDate = LocalDate.today()
+    occurredAt: LocalDate
 ): ContractActivated => ({
     type: "ContractActivated",
     occurredAt,

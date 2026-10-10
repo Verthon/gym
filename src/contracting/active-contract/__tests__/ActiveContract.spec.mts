@@ -4,16 +4,18 @@ import { success } from "#/utils/test.mts";
 import { LocalDate } from "#/utils/LocalDate.mts";
 import { PersonId } from "#/contracting/draft/PersonId.mts";
 
+const today = LocalDate.fromISO("2025-09-13");
+
 describe("ActiveContract", () => {
   it("dispatches a ContractSuspended event when suspended", () => {
     const personId = success(PersonId.create("person-123"));
     const activeContract = ActiveContract.create({ personId });
 
-    activeContract.suspend();
+    activeContract.suspend(today);
 
     expect(activeContract.pullEvents()).toEqual([
       {
-        occurredAt: expect.any(LocalDate),
+        occurredAt: today,
         payload: {
           personId: {
             value: "person-123",

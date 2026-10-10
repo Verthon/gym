@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 
 import { UnsignedContract } from "../UnsignedContract.mts";
 import { PersonId } from "../../draft/PersonId.mts";
@@ -8,6 +8,8 @@ import { MonthlyDues } from "#/money/MonthlyDues.mts";
 import { Money } from "#/money/Money.mts";
 import { EnrollmentFee } from "#/money/EnrollmentFee.mts";
 import { LocalDate } from "#/utils/LocalDate.mts";
+
+const today = LocalDate.fromISO("2025-09-13");
 
 const applicantId = success(PersonId.create("applicant-1"));
 const monthly = success(
@@ -19,11 +21,6 @@ const enrollment = success(
 const fees = success(FeeStructure.create(monthly, enrollment, []));
 
 describe("UnsignedContract - success paths", () => {
-  beforeEach(() => {
-    vi.spyOn(LocalDate, "today").mockReturnValue(
-      LocalDate.fromISO("2025-09-13")
-    );
-  });
 
   it("transitions to a signed contract when both parties sign", () => {
     const unsignedContract = UnsignedContract.create({
@@ -31,7 +28,6 @@ describe("UnsignedContract - success paths", () => {
       personId: applicantId,
     });
 
-    const today = LocalDate.today();
 
     unsignedContract.confirmServiceCommitmentBySalesSpecialist(today);
     unsignedContract.acceptTermsAndConditionsByCustomer(today);
@@ -73,7 +69,6 @@ describe("UnsignedContract - validation failures", () => {
       personId: applicantId,
     });
 
-    const today = LocalDate.today();
 
     unsignedContract.confirmServiceCommitmentBySalesSpecialist(today);
 
@@ -88,7 +83,6 @@ describe("UnsignedContract - validation failures", () => {
       personId: applicantId,
     });
 
-    const today = LocalDate.today();
 
     unsignedContract.acceptTermsAndConditionsByCustomer(today);
 

@@ -1,3 +1,4 @@
+import type { LocalDate } from "#/utils/LocalDate.mts";
 import { PersonId } from "../draft/PersonId.mts";
 import { FeeStructure } from "#/money/FeeStructure.mts";
 import {
@@ -31,36 +32,45 @@ export class SignedContract {
     return new SignedContract(props);
   }
 
-  public toActiveContract() {
+  public toActiveContract(at: LocalDate) {
     if (this.state.kind !== "PaymentAccepted") return;
     this.state = { kind: "Active" };
     this.events.push(
-      contractActivated({
-        personId: this.props.personId,
-        fees: this.props.fees,
-      })
+      contractActivated(
+        {
+          personId: this.props.personId,
+          fees: this.props.fees,
+        },
+        at
+      )
     );
   }
 
-  public recordPaymentAccepted(args: { paymentRef: string }) {
+  public recordPaymentAccepted(args: { paymentRef: string; at: LocalDate }) {
     if (this.state.kind !== "AwaitingPayment") return;
     this.state = { kind: "PaymentAccepted", paymentRef: args.paymentRef };
     this.events.push(
-      paymentConfirmed({
-        personId: this.props.personId,
-        paymentRef: args.paymentRef,
-      })
+      paymentConfirmed(
+        {
+          personId: this.props.personId,
+          paymentRef: args.paymentRef,
+        },
+        args.at
+      )
     );
   }
 
-  public recordPaymentRejected(args: { reason?: string }) {
+  public recordPaymentRejected(args: { reason?: string; at: LocalDate }) {
     if (this.state.kind !== "AwaitingPayment") return;
     this.state = { kind: "PaymentRejected", reason: args.reason };
     this.events.push(
-      paymentFailed({
-        personId: this.props.personId,
-        reason: args.reason,
-      })
+      paymentFailed(
+        {
+          personId: this.props.personId,
+          reason: args.reason,
+        },
+        args.at
+      )
     );
   }
 

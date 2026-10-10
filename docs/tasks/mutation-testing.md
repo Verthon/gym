@@ -49,6 +49,9 @@ Use surviving mutants to find tests that are missing for rules the domain actual
 - After the import change: 778 mutants, 60.54% total / 87.06% covered, 471 killed, 70 survived, 237 no coverage. One mutant went from survived to killed with no test changes. Suspect: `LocalDate.today()` keeps the time of day (`new Date()`), so tests that compare against "today" depend on timing. During the run, a stale `.stryker-tmp` sandbox failed `GovernmentIdInfo` "accepts expiry equal to today" with `EXPIRED`. Check this before triage, because flaky kills make the survivor list unstable
 - A stale `.stryker-tmp/` left by an aborted run gets picked up by vitest and knip (doubled test count, false failures). Vitest doesn't skip gitignored dirs
 
+- Resolved 2026-10-10: the flaky "today" tests. Moved to Node 26 and a `Temporal.PlainDate`-backed `LocalDate`, with an injected `Clock` (instant + zone). Domain code takes `asOf` / `at`, and the specs use a fixed date. After that: 790 mutants, 61.14% total / 87.34% covered, 483 killed, 70 survived, 237 no coverage, 21 s full run. Five repeated test runs gave the same result each time
+- Incremental gotcha: after adding `Clock.spec.mts`, the incremental run still reported a `Clock.system` mutant as survived. `--force` killed all 7. Static mutants (`coveredBy: 0`) kept their old result
+
 ### 2. Triage the 71 survivors by hand (contracting first)
 
 - [ ] Export the survivors from `mutation.json` into a table with columns: file:line, mutator, original → replacement, bucket, rule reference or open question
@@ -91,3 +94,4 @@ Collect these as the task goes:
 - What industry automates (equivalence, suppression of known patterns) and what it leaves to people (relevance), with the sources above
 - Setup issues on TS 7 + pnpm: TS checker unusable, `tsconfigFile` workaround, symlinked skills, explicit `plugins`, the `date-fns` barrel cost
 - Step 2 and step 6 measurements
+- Ambient time as hidden flakiness: `LocalDate.today()` inside VOs and event factories made one mutant flip between killed and survived with no code change. `ContractPrepared.occurredAt` used the wall clock instead of the use case's `asOf`
