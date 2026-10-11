@@ -1,8 +1,7 @@
-# 0001. Run the backend as TypeScript source on Node 24, with no build step
+# 0001. Run the backend as TypeScript source, with no build step
 
 - Date: 2026-09-30
 - Status: Proposed
-- Superseded in part by: [0002](0002-node-26-temporal-and-injected-clock.md) replaces the Node 24 floor.
 
 ## 1. Circumstances
 
@@ -13,7 +12,7 @@ Tests pass against stale code after an agent runs `pnpm build` once and then edi
 The separate `dist/` build also fails at runtime with `ERR_MODULE_NOT_FOUND: Cannot find package '@/utils'`.
 
 ### Constraints
-- Current architecture: Node 24 is the floor. The backend runs on Node 24.21.0. Type stripping is stable from Node 24.12.0.
+- Current architecture: Node type stripping is stable from Node 24.12.0.
 - Current architecture: tsc does not rewrite `paths` aliases such as `@/`. Node type stripping does not transform them either.
 - Current architecture: the project has no current need for a single-file artifact.
 
@@ -29,11 +28,11 @@ The separate `dist/` build also fails at runtime with `ERR_MODULE_NOT_FOUND: Can
 ## 3. Decision
 
 ### Chosen
-Run the backend as TypeScript source on Node 24 with native type stripping. There is no build step.
+Run the backend as TypeScript source with native Node type stripping. There is no build step.
 
 - `tsconfig.json` sets `noEmit`.
 - Node subpath imports (`"#/*": "./src/*"` in `package.json` `"imports"`) replace the `@/` path alias.
-- `package.json` sets `engines.node` to `>=24.14`.
+- `engines.node` stays at 24.14 or later.
 - The deploy contains `src/` and `node_modules`.
 - The start command is `node src/index.ts`.
 

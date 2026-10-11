@@ -77,6 +77,7 @@ Sources: Tune ("Code Quality Foundations for AI-assisted Codebases", "Determinis
 - [ ] Define layers/bounded contexts (`contracting`, `money`, `events`, ...) and the allowed imports between them
 - [ ] Tool: oxlint `no-restricted-imports` vs dependency-cruiser vs custom oxlint plugin
 - [ ] Decide on `src/utils/` (rename/split into owning domain vs allow)
+- [ ] Only `src/utils/Clock.mts` reads `Temporal.Now`, `new Date()` or `GYM_TIME_ZONE` (ADR 0002). Today only a grep checks this. Check which `no-restricted-*` rules oxlint supports
 - [ ] Role rules for DDD building blocks (e.g. Value Object: private ctor + static `create` returning `Result`; application service: single exported function). Prototype one as a custom oxlint rule
 
 ### 5. Harness escape routes

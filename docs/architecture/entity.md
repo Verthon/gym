@@ -10,6 +10,7 @@ Purpose: track an object that matters by identity (e.g. a contract at a given st
 - Each method checks invariants first and returns `Result` when it can fail.
 - State modeled as a discriminated union (`{ kind: ... }`).
 - Emits internal domain events into a private buffer, drained by `pullEvents()`. See [events.md](events.md).
+- Doesn't read the current time. Takes `at: Temporal.Instant` for events and `asOf: LocalDate` for date rules from the caller, so tests set the time instead of racing the clock.
 - Contracting stages are entities, not aggregates: no version fields, no locking.
 
 ## Pattern

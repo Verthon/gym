@@ -11,6 +11,7 @@ Purpose: capture a descriptive concept (e.g. `Money`, `PersonId`).
 - Equality by all properties (`equals`).
 - Behaviors allowed if they don't mutate state; operations return a new VO.
 - Composable, pure, no side effects.
+- Doesn't read the current time. Takes `asOf: LocalDate` for date rules from the caller, so tests set the time instead of racing the clock.
 - Tests are small units.
 
 ## Pattern

@@ -15,7 +15,7 @@ We are defining architectural drivers and recording ADRs. Ask one question at a 
 2. Agent efficiency: an agent finishes a scoped task with 0 corrective prompts.
 3. Reusability: an experiment. Every recurring building block (value object, entity, repository, spec) has a CLI generator, Angular-style, and agents use it.
 
-**`architecture/adr/0001-run-typescript-source-on-node-24.md`** (status Proposed):
+**`architecture/adr/0001-run-typescript-source-with-no-build-step.md`** (status Proposed):
 - Chosen: run the TS source on Node 24 with type stripping and no build step. `tsconfig` sets `noEmit`. Imports use `"#/*": "./src/*"`. `engines.node` is `>=24.14`. The deploy ships `src/` + `node_modules`. The start command is `node src/index.ts`.
 - Rejected: tsc emit to `dist/`; `noEmit` but keep `@/`; relative imports only; the `#src/*` prefix; bundling with esbuild or tsdown.
 - Verified: Node docs (`paths` not transformed; `#/` from v24.14.0), TypeScript 6.0 supports `#/`, and a scratch test passed on Node 24.21, tsc 7.0.2, tsx 4.7.1 and vitest 3.2.4.
