@@ -48,7 +48,7 @@ export class ContractDraft {
   }
 
   public toNotSignedContract(
-    asOf: LocalDate,
+    { at, asOf }: { at: Temporal.Instant; asOf: LocalDate },
     guardian?: GuardianCoSignature
   ):
     | ReturnType<typeof okVoid>
@@ -84,7 +84,7 @@ export class ContractDraft {
           personId: this._props.userInfo.personId,
           fees: this._props.offer.fees,
         },
-        asOf
+        at
       )
     );
 

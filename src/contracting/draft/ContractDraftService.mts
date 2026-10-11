@@ -14,7 +14,9 @@ export const prepareUnsignedContract =
     const d = await deps.drafts.get(input.draftId);
     if (!d) return err({ code: 'NOT_FOUND' });
 
-    const r = d.toNotSignedContract(LocalDate.today(deps.clock) /*, guardian? */);
+    const at = deps.clock.instant();
+    const asOf = LocalDate.fromInstant(at, deps.clock.timeZone);
+    const r = d.toNotSignedContract({ at, asOf } /*, guardian? */);
     if (!r.success) return err({ code: r.error.code });
 
     await deps.drafts.save(input.draftId, d);

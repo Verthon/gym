@@ -1,5 +1,3 @@
-import type { Clock } from "./Clock.mts";
-
 export class LocalDate {
 	private readonly value: Temporal.PlainDate;
 
@@ -11,10 +9,8 @@ export class LocalDate {
 		return new LocalDate(Temporal.PlainDate.from(input));
 	}
 
-	public static today(clock: Clock): LocalDate {
-		return new LocalDate(
-			clock.instant().toZonedDateTimeISO(clock.timeZone).toPlainDate()
-		);
+	public static fromInstant(at: Temporal.Instant, timeZone: string): LocalDate {
+		return new LocalDate(at.toZonedDateTimeISO(timeZone).toPlainDate());
 	}
 
 	public isBefore(other: LocalDate): boolean {

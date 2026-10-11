@@ -1,10 +1,9 @@
 import type { FeeStructure } from "#/money/FeeStructure.mts";
-import type { LocalDate } from "#/utils/LocalDate.mts";
 import type { PersonId } from "../draft/PersonId.mts";
 
 export type ContractSigned = Readonly<{
     type: "ContractSigned";
-    occurredAt: LocalDate;
+    occurredAt: Temporal.Instant;
     payload: Readonly<{
         personId: PersonId;
         fees: FeeStructure;
@@ -13,7 +12,7 @@ export type ContractSigned = Readonly<{
 
 export const contractSigned = (
     payload: ContractSigned["payload"],
-    occurredAt: LocalDate
+    occurredAt: Temporal.Instant
 ): ContractSigned => ({
     type: "ContractSigned",
     occurredAt,

@@ -1,9 +1,8 @@
-import type { LocalDate } from "#/utils/LocalDate.mts";
 import type { PersonId } from "../draft/PersonId.mts";
 
 export type ContractSuspended = Readonly<{
   type: "ContractSuspended";
-  occurredAt: LocalDate;
+  occurredAt: Temporal.Instant;
   payload: Readonly<{
     personId: PersonId;
   }>;
@@ -11,7 +10,7 @@ export type ContractSuspended = Readonly<{
 
 export const contractSuspended = (
   payload: ContractSuspended["payload"],
-  occurredAt: LocalDate
+  occurredAt: Temporal.Instant
 ): ContractSuspended => ({
   type: "ContractSuspended",
   occurredAt,

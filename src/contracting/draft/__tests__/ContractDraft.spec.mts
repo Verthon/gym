@@ -13,6 +13,7 @@ import { MonthlyDues } from "#/money/MonthlyDues.mts";
 import { FeeStructure } from "#/money/FeeStructure.mts";
 
 const today = LocalDate.fromISO("2025-09-13");
+const at = Temporal.Instant.from("2025-09-13T10:00:00Z");
 
 describe("ContractDraft - success paths", () => {
 
@@ -79,14 +80,14 @@ describe("ContractDraft - success paths", () => {
       })
     );
 
-    const promotion = draft.toNotSignedContract(today);
+    const promotion = draft.toNotSignedContract({ at, asOf: today });
     expect(promotion).toEqual({
       success: true,
       value: undefined,
     });
     expect(draft.pullEvents()).toEqual([
       {
-        occurredAt: LocalDate.fromISO("2025-09-13"),
+        occurredAt: at,
         payload: {
           fees: {
             enrollmentFee: {
@@ -155,7 +156,7 @@ describe("ContractDraft - success paths", () => {
     );
 
     const promotion = draft.toNotSignedContract(
-      today,
+      { at, asOf: today },
       guardianCoSignature
     );
     expect(promotion).toEqual({ success: true, value: undefined });
@@ -196,7 +197,7 @@ describe("ContractDraft - validation failures", () => {
       })
     );
 
-    const result = draft.toNotSignedContract(today);
+    const result = draft.toNotSignedContract({ at, asOf: today });
     failWith(result, "MINOR_REQUIRES_GUARDIAN");
   });
 
@@ -243,7 +244,7 @@ describe("ContractDraft - validation failures", () => {
     );
 
     const result = draft.toNotSignedContract(
-      today,
+      { at, asOf: today },
       wrongCoSignature
     );
     failWith(result, "GUARDIAN_FOR_DIFFERENT_MINOR");
@@ -281,7 +282,7 @@ describe("ContractDraft - validation failures", () => {
       })
     );
 
-    const result = draft.toNotSignedContract(today.plusDays(1));
+    const result = draft.toNotSignedContract({ at, asOf: today.plusDays(1) });
     failWith(result, "ID_EXPIRED_AT_PROMOTION");
   });
 
@@ -313,11 +314,11 @@ describe("ContractDraft - validation failures", () => {
       })
     );
 
-    expect(draft.toNotSignedContract(today)).toEqual({
+    expect(draft.toNotSignedContract({ at, asOf: today })).toEqual({
       success: true,
       value: undefined,
     });
-    const secondAttempt = draft.toNotSignedContract(today);
+    const secondAttempt = draft.toNotSignedContract({ at, asOf: today });
     failWith(secondAttempt, "INVALID_STATUS");
   });
 });

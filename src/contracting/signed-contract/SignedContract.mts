@@ -1,4 +1,3 @@
-import type { LocalDate } from "#/utils/LocalDate.mts";
 import { PersonId } from "../draft/PersonId.mts";
 import { FeeStructure } from "#/money/FeeStructure.mts";
 import {
@@ -32,7 +31,7 @@ export class SignedContract {
     return new SignedContract(props);
   }
 
-  public toActiveContract(at: LocalDate) {
+  public toActiveContract(at: Temporal.Instant) {
     if (this.state.kind !== "PaymentAccepted") return;
     this.state = { kind: "Active" };
     this.events.push(
@@ -46,7 +45,7 @@ export class SignedContract {
     );
   }
 
-  public recordPaymentAccepted(args: { paymentRef: string; at: LocalDate }) {
+  public recordPaymentAccepted(args: { paymentRef: string; at: Temporal.Instant }) {
     if (this.state.kind !== "AwaitingPayment") return;
     this.state = { kind: "PaymentAccepted", paymentRef: args.paymentRef };
     this.events.push(
@@ -60,7 +59,7 @@ export class SignedContract {
     );
   }
 
-  public recordPaymentRejected(args: { reason?: string; at: LocalDate }) {
+  public recordPaymentRejected(args: { reason?: string; at: Temporal.Instant }) {
     if (this.state.kind !== "AwaitingPayment") return;
     this.state = { kind: "PaymentRejected", reason: args.reason };
     this.events.push(

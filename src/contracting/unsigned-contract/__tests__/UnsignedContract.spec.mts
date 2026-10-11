@@ -7,9 +7,8 @@ import { FeeStructure } from "#/money/FeeStructure.mts";
 import { MonthlyDues } from "#/money/MonthlyDues.mts";
 import { Money } from "#/money/Money.mts";
 import { EnrollmentFee } from "#/money/EnrollmentFee.mts";
-import { LocalDate } from "#/utils/LocalDate.mts";
 
-const today = LocalDate.fromISO("2025-09-13");
+const at = Temporal.Instant.from("2025-09-13T10:00:00Z");
 
 const applicantId = success(PersonId.create("applicant-1"));
 const monthly = success(
@@ -29,13 +28,13 @@ describe("UnsignedContract - success paths", () => {
     });
 
 
-    unsignedContract.confirmServiceCommitmentBySalesSpecialist(today);
-    unsignedContract.acceptTermsAndConditionsByCustomer(today);
+    unsignedContract.confirmServiceCommitmentBySalesSpecialist(at);
+    unsignedContract.acceptTermsAndConditionsByCustomer(at);
     const promotion = unsignedContract.toSignedContract();
     expect(promotion).toEqual({ success: true, value: undefined });
     expect(unsignedContract.pullEvents()).toEqual([
       {
-        occurredAt: LocalDate.fromISO("2025-09-13"),
+        occurredAt: at,
         payload: {
           fees: {
             enrollmentFee: {
@@ -70,7 +69,7 @@ describe("UnsignedContract - validation failures", () => {
     });
 
 
-    unsignedContract.confirmServiceCommitmentBySalesSpecialist(today);
+    unsignedContract.confirmServiceCommitmentBySalesSpecialist(at);
 
     const promotion = unsignedContract.toSignedContract();
     failWith(promotion, "NOT_FULLY_SIGNED");
@@ -84,7 +83,7 @@ describe("UnsignedContract - validation failures", () => {
     });
 
 
-    unsignedContract.acceptTermsAndConditionsByCustomer(today);
+    unsignedContract.acceptTermsAndConditionsByCustomer(at);
 
     const promotion = unsignedContract.toSignedContract();
     failWith(promotion, "NOT_FULLY_SIGNED");

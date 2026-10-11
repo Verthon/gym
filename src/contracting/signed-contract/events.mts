@@ -1,10 +1,9 @@
 import type { FeeStructure } from "#/money/FeeStructure.mts";
-import type { LocalDate } from "#/utils/LocalDate.mts";
 import type { PersonId } from "../draft/PersonId.mts";
 
 export type PaymentConfirmed = Readonly<{
     type: "PaymentConfirmed";
-    occurredAt: LocalDate;
+    occurredAt: Temporal.Instant;
     payload: Readonly<{
         personId: PersonId;
         paymentRef: string;
@@ -13,7 +12,7 @@ export type PaymentConfirmed = Readonly<{
 
 export const paymentConfirmed = (
     payload: PaymentConfirmed["payload"],
-    occurredAt: LocalDate
+    occurredAt: Temporal.Instant
 ): PaymentConfirmed => ({
     type: "PaymentConfirmed",
     occurredAt,
@@ -22,7 +21,7 @@ export const paymentConfirmed = (
 
 export type PaymentFailed = Readonly<{
     type: "PaymentFailed";
-    occurredAt: LocalDate;
+    occurredAt: Temporal.Instant;
     payload: Readonly<{
         personId: PersonId;
         reason?: string;
@@ -31,7 +30,7 @@ export type PaymentFailed = Readonly<{
 
 export const paymentFailed = (
     payload: PaymentFailed["payload"],
-    occurredAt: LocalDate
+    occurredAt: Temporal.Instant
 ): PaymentFailed => ({
     type: "PaymentFailed",
     occurredAt,
@@ -40,7 +39,7 @@ export const paymentFailed = (
 
 export type ContractActivated = Readonly<{
     type: "ContractActivated";
-    occurredAt: LocalDate;
+    occurredAt: Temporal.Instant;
     payload: Readonly<{
         personId: PersonId;
         fees: FeeStructure;
@@ -49,7 +48,7 @@ export type ContractActivated = Readonly<{
 
 export const contractActivated = (
     payload: ContractActivated["payload"],
-    occurredAt: LocalDate
+    occurredAt: Temporal.Instant
 ): ContractActivated => ({
     type: "ContractActivated",
     occurredAt,

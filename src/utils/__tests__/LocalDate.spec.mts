@@ -1,24 +1,23 @@
 import { describe, it, expect } from "vitest";
 
-import { Clock } from "../Clock.mts";
 import { LocalDate } from "../LocalDate.mts";
 
-describe("LocalDate.today", () => {
-	it("is the calendar date of the clock's instant in the clock's zone", () => {
-		const instant = "2025-09-12T22:30:00Z";
-		expect(LocalDate.today(Clock.fixed(instant, "Europe/Warsaw")).toISO()).toBe(
+describe("LocalDate.fromInstant", () => {
+	it("is the calendar date of the instant in the given zone", () => {
+		const instant = Temporal.Instant.from("2025-09-12T22:30:00Z");
+		expect(LocalDate.fromInstant(instant, "Europe/Warsaw").toISO()).toBe(
 			"2025-09-13"
 		);
-		expect(LocalDate.today(Clock.fixed(instant, "Europe/Lisbon")).toISO()).toBe(
+		expect(LocalDate.fromInstant(instant, "Europe/Lisbon").toISO()).toBe(
 			"2025-09-12"
 		);
 	});
 
 	it("is equal for two instants on the same day", () => {
-		const morning = Clock.fixed("2025-09-13T06:00:00Z");
-		const evening = Clock.fixed("2025-09-13T20:00:00Z");
-		const a = LocalDate.today(morning);
-		const b = LocalDate.today(evening);
+		const morning = Temporal.Instant.from("2025-09-13T06:00:00Z");
+		const evening = Temporal.Instant.from("2025-09-13T20:00:00Z");
+		const a = LocalDate.fromInstant(morning, "Europe/Warsaw");
+		const b = LocalDate.fromInstant(evening, "Europe/Warsaw");
 		expect(a.equals(b)).toBe(true);
 		expect(a.isBefore(b)).toBe(false);
 		expect(a.isAfter(b)).toBe(false);

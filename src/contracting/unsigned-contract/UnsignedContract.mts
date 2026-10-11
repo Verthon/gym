@@ -1,4 +1,3 @@
-import type { LocalDate } from "#/utils/LocalDate.mts";
 import { err, okVoid, type Result } from "#/utils/Result.mts";
 import type { PersonId } from "../draft/PersonId.mts";
 import type { FeeStructure } from "#/money/FeeStructure.mts";
@@ -6,9 +5,9 @@ import { contractSigned, type ContractSigned } from "./events.mts";
 
 type UnsignedState =
   | { kind: "Pending" }
-  | { kind: "ConfirmedBySales"; at: LocalDate }
-  | { kind: "AcceptedByCustomer"; at: LocalDate }
-  | { kind: "Signed"; at: LocalDate };
+  | { kind: "ConfirmedBySales"; at: Temporal.Instant }
+  | { kind: "AcceptedByCustomer"; at: Temporal.Instant }
+  | { kind: "Signed"; at: Temporal.Instant };
 
 type UnsignedContractProps = {
   personId: PersonId;
@@ -29,7 +28,7 @@ export class UnsignedContract {
   }
 
   public confirmServiceCommitmentBySalesSpecialist(
-    at: LocalDate
+    at: Temporal.Instant
   ): Result<void, "INVALID_STATE"> {
     switch (this.state.kind) {
       case "Pending":
@@ -53,7 +52,7 @@ export class UnsignedContract {
   }
 
   public acceptTermsAndConditionsByCustomer(
-    at: LocalDate
+    at: Temporal.Instant
   ): Result<void, "INVALID_STATE"> {
     switch (this.state.kind) {
       case "Pending":
