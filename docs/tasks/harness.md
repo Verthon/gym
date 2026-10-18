@@ -58,6 +58,12 @@ Audit date: 2026-09-27
 - [x] `.githooks/*` fail with an explicit "do not bypass" message when `pnpm` is missing
 - [ ] Make `pnpm` resolvable in non-interactive shells (details below)
 - [ ] Protect `.claude/settings.json`, `.claude/hooks/**`, `.githooks/**` from agent edits (deny `Edit(...)`), so an agent can't disable the guard
+- [ ] Block `git push --force`, `--force-with-lease` and `+<refspec>` pushes to `main`. Not covered by `block-hook-bypass.sh` today
+- [ ] Research (deep-research): how teams stop a coding agent from weakening its own safety net under trunk-based development, with no PR review to catch it. Scope:
+  - Files: `.githooks/**`, `.claude/**`, `.github/**`, `oxlint.config.mts`, `tsconfig.json`, `.dependency-cruiser.cjs`, `pnpm-workspace.yaml`, `package.json` scripts
+  - Edit paths: `Edit`/`Write` tools and Bash (`sed`, heredoc, `git checkout`), not only the tools
+  - Candidates to compare: Claude deny rules, PreToolUse hooks, pre-commit check on staged rule files with a human override, sandboxing, server-side checks
+  - Output feeds `architecture-check.md` §3 and the trunk ADR
 - [ ] Decide on bare `node`: pnpm 12 global shim is not active (`command -v node` → nvm), so `node x.js` outside pnpm scripts uses nvm's version, not the lockfile pin
 - [ ] Bypass hook matches the flag string anywhere in a Bash command (heredocs, `echo`, docs) — narrow to actual `git` invocations if false positives get annoying
 
