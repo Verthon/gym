@@ -63,20 +63,22 @@ Stage transitions (`toSignedContract`, `toActiveContract`) currently don't impor
 
 ### 1. Setup
 
-- [ ] Root devDependency `dependency-cruiser@18.6.0` (exact)
-- [ ] `pnpm-workspace.yaml`: `packageExtensions.dependency-cruiser.dependencies.typescript: npm:@typescript/typescript6@6.0.2`. Not in `package.json` `pnpm`: pnpm 12 ignores it there
-- [ ] Check with `depcruise --info`: `typescript` row must show `6.x`, and `tsc -v` must still show 7.x
-- [ ] `.dependency-cruiser.cjs` at repo root: `tsConfig: { fileName: "tsconfig.json" }`, `tsPreCompilationDeps: true` (type-only imports count). Do not set `extraExtensionsToScan: [".mts"]`: it drops the cruised dependencies to near zero
-- [ ] Rules from the table above as `allowed` + `allowedSeverity: "error"`, plus `forbidden` for `no-circular`, `no-orphans` and test code in production
-- [ ] Script `arch` in root `package.json`, added to `pnpm check`
-- [ ] `.githooks/pre-commit`: `pnpm arch` after `pnpm type-check`. The hooks call scripts one by one, not `pnpm check`
-- [ ] `.github/workflows/check.yml`: `Arch` step after `Type-check`, same `if:` condition as the other steps
-- [ ] `oxlint.config.mts`: `"import/no-cycle": "error"` for lint-time feedback on runtime cycles
+- [x] Root devDependency `dependency-cruiser@18.6.0` (exact)
+- [x] `pnpm-workspace.yaml`: `packageExtensions.dependency-cruiser.dependencies.typescript: npm:@typescript/typescript6@6.0.2`. Not in `package.json` `pnpm`: pnpm 12 ignores it there
+- [x] Check with `depcruise --info`: `typescript` row must show `6.x`, and `tsc -v` must still show 7.x
+- [x] `.dependency-cruiser.cjs` at repo root: `tsConfig: { fileName: "tsconfig.json" }`, `tsPreCompilationDeps: true` (type-only imports count). Do not set `extraExtensionsToScan: [".mts"]`: it drops the cruised dependencies to near zero
+- [x] Rules from the table above as `allowed` + `allowedSeverity: "error"`, plus `forbidden` for `no-circular`, `no-orphans` and test code in production
+- [x] Script `arch` in root `package.json`, added to `pnpm check`
+- [x] `.githooks/pre-commit`: `pnpm arch` after `pnpm type-check`. The hooks call scripts one by one, not `pnpm check`
+- [x] `.github/workflows/check.yml`: `Arch` step after `Type-check`, same `if:` condition as the other steps
+- [x] `oxlint.config.mts`: `"import/no-cycle": "error"` for lint-time feedback on runtime cycles
 
 ### 2. Guard against an empty or blind run
 
-- [ ] Script fails if cruised modules < number of `src/**/*.mts` files, or if output contains `missing-typescript-transpiler`. This also catches the `packageExtensions` block being dropped or moved
-- [ ] Verification: inject `money → contracting` and `unsigned-contract → active-contract` imports, confirm both fail; inject an import from a new folder `src/shared/`, confirm the allowlist fails it; import `#/utils/test.mts` from a domain file, confirm it fails
+- [x] Script fails if cruised modules < number of `src/**/*.mts` files, or if output contains `missing-typescript-transpiler`. This also catches the `packageExtensions` block being dropped or moved
+- [x] Verification: inject `money → contracting` and `unsigned-contract → active-contract` imports, confirm both fail; inject an import from a new folder `src/shared/`, confirm the allowlist fails it; import `#/utils/test.mts` from a domain file, confirm it fails
+
+Verified 2026-10-18: `money → contracting` and `unsigned-contract → active-contract` (both type-only), `src/shared/` and `src/utils/test.mts` from `src/money` all fail, plus a type-only cycle `Result ↔ LocalDate`: 6 errors, exit 1. Excluding `src/money` fails the guard with 31 of 37 files cruised. Dropping `packageExtensions` gives `0 modules` and `missing-typescript-transpiler`, and the guard fails.
 
 ### 3. Guard against rule edits
 
