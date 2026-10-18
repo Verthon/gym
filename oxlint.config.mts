@@ -38,6 +38,8 @@ export default defineConfig({
 
     // Disable browser-centric unicorn rules
     "unicorn/prefer-module": "off",
+
+    "import/no-cycle": "error",
   },
 
   options: {
