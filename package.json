@@ -24,12 +24,13 @@
     "start": "node src/index.ts",
     "check:no-js": "node scripts/check-no-js.mts",
     "type-check": "tsc",
+    "arch": "node scripts/check-arch.mts",
     "test:unit": "vitest run",
     "scan:deadcode": "knip",
     "mutation": "stryker run",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "check": "pnpm check:no-js && pnpm lint && pnpm type-check && pnpm run test:unit",
+    "check": "pnpm check:no-js && pnpm lint && pnpm type-check && pnpm arch && pnpm run test:unit",
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },
   "dependencies": {
@@ -40,6 +41,7 @@
     "@stryker-mutator/core": "10.0.0",
     "@stryker-mutator/vitest-runner": "10.0.0",
     "@types/node": "26.6.4",
+    "dependency-cruiser": "18.6.0",
     "knip": "6.38.0",
     "oxlint": "1.85.0",
     "oxlint-tsgolint": "7.0.2003",

@@ -8,3 +8,4 @@ fi
 pnpm check:no-js
 pnpm lint
 pnpm type-check
+pnpm arch

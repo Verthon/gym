@@ -2,3 +2,7 @@ allowBuilds:
   esbuild: true
   node: true
 savePrefix: ''
+packageExtensions:
+  dependency-cruiser:
+    dependencies:
+      typescript: npm:@typescript/typescript6@6.0.2

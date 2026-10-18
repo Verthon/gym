@@ -41,6 +41,10 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm run type-check
 
+      - name: Arch
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm run arch
+
       - name: Unit tests
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm run test:unit
