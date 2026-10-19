@@ -52,7 +52,7 @@ describe("SignedContract - success paths", () => {
                         monthlyDues: expect.any(Object),
                     }),
                 },
-                type: "ContractActivated",
+                type: "ContractStarted",
             },
         ]);
     });

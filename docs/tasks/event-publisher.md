@@ -24,10 +24,8 @@ Align event code with `docs/architecture/events.md` and resolve the `no-unsafe-t
 
 ## Revisit when
 
-- A real consumer exists (for example, Pass Registration reacting to `ContractActivated`), or events must be persisted (outbox).
+- A real consumer exists (for example, Pass Registration reacting to `ContractStarted`), or events must be persisted (outbox).
 
 ## Open
 
-- The code uses `ContractActivated` but the board says "Contract started". Pick one name.
 - `docs/domain.md` is missing `ContractSuspended` and `ContractExpired`.
-- `UnsignedContract` emits `ContractSigned` twice on the path "customer accepts, then sales confirms" (once in `confirmServiceCommitmentBySalesSpecialist`, again in `toSignedContract`). The reverse path emits it only once.

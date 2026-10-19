@@ -124,12 +124,11 @@ Divergences between the book and the pre-existing model, resolved 2026-09-28.
 ## Implementation gaps (current code vs this document)
 
 - No contract ID; events carry only `personId` (FR-C01).
-- `UnsignedContract` emits Contract Signed twice or not at all depending on signing order (FR-C08).
 - Two `FeeStructure` classes; the draft uses the one without penalties (FR-C05).
 - Draft carries only fees from the offer (FR-C03).
 - ID verification attestation not modeled (FR-C05).
 - `SignedContract` treats Payment Failed as terminal (FR-C12).
-- `ContractActivated` naming; start policy implicit (FR-C13).
+- Start policy implicit (FR-C13).
 - Signing window, end date and minimum commitment not modeled (FR-C09, FR-C14, FR-C15).
 - `ContractSuspended` exists without requirement (D3).
 - `docs/domain.md` still lists pass registration rules under Active Contract (D4).

@@ -17,11 +17,11 @@
 | Contract Signed | Event: both parties signed | unsigned | |
 | Payment Confirmed | Event: payment succeeded | signed | |
 | Payment Failed | Event: payment did not succeed | signed | |
+| Contract Started | Event: paid contract comes into force | signed | |
 | Contract Suspended | Event: active contract suspended | active | |
 
 ## Open
 
-- `ContractActivated` (code) vs "Contract started" (board)
 - Code uses `userId` / `userInfo` / `PersonId` where the board says Potential Customer
 - `toNotSignedContract` vs stage name Unsigned Contract
 - `recordPaymentAccepted` / `recordPaymentRejected` vs events Payment Confirmed / Payment Failed

@@ -37,8 +37,8 @@ export const paymentFailed = (
     payload,
 });
 
-export type ContractActivated = Readonly<{
-    type: "ContractActivated";
+export type ContractStarted = Readonly<{
+    type: "ContractStarted";
     occurredAt: Temporal.Instant;
     payload: Readonly<{
         personId: PersonId;
@@ -46,11 +46,11 @@ export type ContractActivated = Readonly<{
     }>;
 }>;
 
-export const contractActivated = (
-    payload: ContractActivated["payload"],
+export const contractStarted = (
+    payload: ContractStarted["payload"],
     occurredAt: Temporal.Instant
-): ContractActivated => ({
-    type: "ContractActivated",
+): ContractStarted => ({
+    type: "ContractStarted",
     occurredAt,
     payload,
 });
@@ -58,4 +58,4 @@ export const contractActivated = (
 export type SignedContractEvent =
     | PaymentConfirmed
     | PaymentFailed
-    | ContractActivated;
+    | ContractStarted;

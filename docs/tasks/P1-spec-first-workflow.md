@@ -24,7 +24,6 @@ Spec, then implementation, so a cheaper model (e.g. Gemini) can do the coding ag
 ## Next
 
 1. [ ] Resolve naming conflicts in `src/contracting/LANGUAGE.md` → `## Open` (with the book at hand), fill `Avoid`, rename code
-   - `ContractActivated` vs "Contract started"
    - `userId` / `userInfo` / `PersonId` vs Potential Customer
    - `toNotSignedContract` vs Unsigned Contract
    - `recordPaymentAccepted` / `recordPaymentRejected` vs Payment Confirmed / Payment Failed

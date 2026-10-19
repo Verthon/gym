@@ -3,7 +3,7 @@ import { FeeStructure } from "#/money/FeeStructure.mts";
 import {
   paymentConfirmed,
   paymentFailed,
-  contractActivated,
+  contractStarted,
   type SignedContractEvent,
 } from "./events.mts";
 
@@ -35,7 +35,7 @@ export class SignedContract {
     if (this.state.kind !== "PaymentAccepted") return;
     this.state = { kind: "Active" };
     this.events.push(
-      contractActivated(
+      contractStarted(
         {
           personId: this.props.personId,
           fees: this.props.fees,
