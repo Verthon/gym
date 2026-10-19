@@ -35,16 +35,7 @@ export class UnsignedContract {
         this.state = { kind: "ConfirmedBySales", at };
         return okVoid();
       case "AcceptedByCustomer":
-        this.state = { kind: "Signed", at };
-        this.events.push(
-          contractSigned(
-            {
-              personId: this.props.personId,
-              fees: this.props.fees,
-            },
-            at
-          )
-        );
+        this.sign(at);
         return okVoid();
       default:
         return err("INVALID_STATE");
@@ -59,7 +50,7 @@ export class UnsignedContract {
         this.state = { kind: "AcceptedByCustomer", at };
         return okVoid();
       case "ConfirmedBySales":
-        this.state = { kind: "Signed", at };
+        this.sign(at);
         return okVoid();
       default:
         return err("INVALID_STATE");
@@ -71,17 +62,20 @@ export class UnsignedContract {
       return err({ code: "NOT_FULLY_SIGNED" });
     }
 
+    return okVoid();
+  }
+
+  private sign(at: Temporal.Instant) {
+    this.state = { kind: "Signed", at };
     this.events.push(
       contractSigned(
         {
           personId: this.props.personId,
           fees: this.props.fees,
         },
-        this.state.at
+        at
       )
     );
-
-    return okVoid();
   }
 
   public pullEvents(): ContractSigned[] {

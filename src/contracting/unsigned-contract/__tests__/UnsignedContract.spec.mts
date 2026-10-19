@@ -59,6 +59,37 @@ describe("UnsignedContract - success paths", () => {
       },
     ]);
   });
+
+  it("emits ContractSigned once, at the second signature, when the customer accepts first", () => {
+    const acceptedAt = Temporal.Instant.from("2025-09-13T10:00:00Z");
+    const confirmedAt = Temporal.Instant.from("2025-09-14T10:00:00Z");
+    const unsignedContract = UnsignedContract.create({
+      fees,
+      personId: applicantId,
+    });
+
+    unsignedContract.acceptTermsAndConditionsByCustomer(acceptedAt);
+    unsignedContract.confirmServiceCommitmentBySalesSpecialist(confirmedAt);
+    unsignedContract.toSignedContract();
+
+    const events = unsignedContract.pullEvents();
+    expect(events.map((e) => e.type)).toEqual(["ContractSigned"]);
+    expect(events[0]?.occurredAt).toEqual(confirmedAt);
+  });
+
+  it("does not emit ContractSigned again when promoted twice", () => {
+    const unsignedContract = UnsignedContract.create({
+      fees,
+      personId: applicantId,
+    });
+
+    unsignedContract.confirmServiceCommitmentBySalesSpecialist(at);
+    unsignedContract.acceptTermsAndConditionsByCustomer(at);
+    unsignedContract.toSignedContract();
+    unsignedContract.toSignedContract();
+
+    expect(unsignedContract.pullEvents()).toHaveLength(1);
+  });
 });
 
 describe("UnsignedContract - validation failures", () => {
