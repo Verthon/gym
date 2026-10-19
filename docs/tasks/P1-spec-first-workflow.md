@@ -18,6 +18,8 @@ Spec, then implementation, so a cheaper model (e.g. Gemini) can do the coding ag
 7. Spec template (adapted from Pocock's to-spec): Problem · Solution · Seam (use case) · Commands (actor, preconditions, AC list) · Implementation decisions (type shapes allowed, no file paths) · Out of scope · Open questions (blocking/non-blocking). No "don't interview": open questions that affect a criterion block the spec.
 8. Language lives in `src/contracting/CONTEXT.md` + `src/contracting/LANGUAGE.md` at the bounded-context level, not per stage. The `Avoid` column in `LANGUAGE.md` is what the vocabulary check reads.
 9. Vocabulary check: start with a grep-based script in `pnpm check` that reads `Avoid` per `Stages` folder. Move to a custom oxlint rule only if false positives hurt.
+10. Acceptance tests use a thin version of Farley's four layers (decided 2026-10-19): test cases in domain language → DSL → driver → system. The driver calls the use case in-process today and can switch to HTTP without changing test cases. Source: `~/Projects/advisors/research/testing-rules/raw/2026-10-18-acceptance-cd.md` rules 2, 4, 9 (Farley ATDD guide, read via archive copy; check before citing in an ADR).
+11. All three test layers are locked as one set and approved together; the spec pins the use-case signature so the driver compiles against it (decided 2026-10-19, simplest option). Files sit in `__tests__/` with an `.acceptance.` infix (`<UseCase>.acceptance.spec.mts`, DSL and driver in one `<context>.acceptance.dsl.mts`), so lock and AC-ID check share one glob `**/*.acceptance.*` and no locked config changes. Acceptance tests fail on type-check until the coder creates the use case; `implement-spec` must say this red is expected.
 
 ## Next
 

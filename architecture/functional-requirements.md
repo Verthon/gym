@@ -44,8 +44,8 @@ Unsigned Contract can lapse (signing window exceeded).
 - **FR-C03** The draft captures a snapshot of the offer terms at preparation time: offer ID, the membership duration chosen by the Sales Specialist from the durations the offer allows (1, 3, 6 or 12 months), service package (accessible facilities), and fee structure. Later changes to the offer do not affect the contract.
 - **FR-C04** The draft is correctable: missing or invalid data can be supplied or fixed until the Contract validation policy passes.
 - **FR-C05** The draft becomes an Unsigned Contract only when all rules of the **Contract validation policy** pass, evaluated as of the preparation date:
-  - **Identification rule** — government ID information (document type, number, expiry date) is present, its verification is attested by the Sales Specialist, and the ID is not expired on the preparation date.
-  - **Age verification rule** — the customer is at least 18 on the preparation date, or a Guardian co-signature for this specific customer is present.
+  - **Identification rule** — government ID information (document type, number, expiry date) is present, its verification is attested by the Sales Specialist, and the ID is not expired on the preparation date (an ID expiring on the preparation date passes).
+  - **Age verification rule** — the customer is at least 18 on the preparation date (turning 18 that day passes), or a Guardian co-signature for this specific customer is present.
   - **Fee structure rule** — monthly dues, enrollment fee and penalties are each itemized; no amount is negative.
 - **FR-C06** On passing validation, **Contract Prepared** is emitted (consumed by the frontend). The preparation date starts the signing window.
 
