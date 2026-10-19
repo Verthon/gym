@@ -1,0 +1,222 @@
+{
+  "skill": "fe-typesystem-leverage",
+  "type": "output",
+  "decision_rule": "If the with-skill arm does not beat the without-skill arm on assertions passed, the skill is deleted, not revised. Written before the run, per docs/adr/0003 and verbatim in intent from fe-architecture-error-handling/evals/evals.json.",
+  "cases": [
+    {
+      "id": "aliases-no-identity",
+      "concept": "1. Aliases don't create identity",
+      "prompt_file": "c1.txt",
+      "assertions": [
+        "States that a type alias does not create a new type - the four ID aliases are one type to the compiler.",
+        "Shows or states that passing one ID where another is expected compiles with no error.",
+        "Asks whether the IDs actually cross paths in one signature or collection before recommending branding.",
+        "Recommends branding as compile-time only, naming the zero runtime cost or the boundary cast tax.",
+        "Does not present branding as unconditionally correct."
+      ]
+    },
+    {
+      "id": "shape-not-meaning",
+      "concept": "2. Shape checked, not meaning",
+      "prompt_file": "c2.txt",
+      "assertions": [
+        "Identifies the unit mismatch: rate 20 treated as a fraction, so applyDiscount(100,20) returns 2000.",
+        "States that the build being green tells you nothing here - the compiler checked shape, not meaning.",
+        "Attributes the root cause to Percentage being an alias for number, not a distinct type.",
+        "Notes that a brand relocates the mistake to the constructor rather than removing it.",
+        "Proposes a concrete convention fix (fraction everywhere, or explicit conversion at the boundary)."
+      ]
+    },
+    {
+      "id": "cutting-question",
+      "concept": "3. The cutting question, both failure states",
+      "prompt_file": "c3.txt",
+      "assertions": [
+        "Asks whether the two types ever cross paths in one signature or collection, rather than answering brand/don't-brand directly.",
+        "Names the over-brand cost as a cast tax paid at every boundary.",
+        "Names that normalizing `as` erodes the seam - casting stops being a signal where it matters.",
+        "Distinguishes the mixing problem (compile-time) from the validation problem (runtime).",
+        "Names who pays: the teams paying assignment ceremony vs whoever made the decision."
+      ]
+    },
+    {
+      "id": "enforcement-placement",
+      "concept": "4. Enforcement placement",
+      "prompt_file": "c4.txt",
+      "assertions": [
+        "Rejects the 'value object is just a stronger brand' framing explicitly.",
+        "Frames the choice as two different questions, not one strength ladder.",
+        "States the brand is compile-time only with zero runtime cost and enforces nothing at runtime.",
+        "States the value object is a runtime construct carrying validation, and is charged for it.",
+        "Makes the decision turn on where enforcement must sit (number of untrusted construction sites), not on which is stronger."
+      ]
+    }
+  ],
+  "arms": [
+    "with_skill",
+    "without_skill"
+  ],
+  "arm_isolation": {
+    "mechanism": "cwd-scoped skill discovery",
+    "without_skill": "claude -p '<prompt>' --model sonnet from a scratch directory outside any git repo containing no .claude/ - the advisor skills are project-scoped in this repo, absent and unloadable there.",
+    "with_skill": "the identical command from the repo root, where the skill listing includes this skill.",
+    "why": "Isolation is structural, not instructed. See tasks/eval-control-arm-is-contaminated.md.",
+    "verified": "2026-09-02, by probing each cwd for its skill listing."
+  },
+  "runs_per_arm": 1,
+  "record": [
+    "model",
+    "assertions_passed",
+    "words",
+    "isolation",
+    "body_loaded"
+  ],
+  "model_note": "An eval result is model-dependent. Every run records the model it ran on. These skills install into repos that may run Sonnet, Haiku, or a non-Claude CLI; grading only on the strongest model tunes the library to that model and thins it for everyone else.",
+  "runs": [
+    {
+      "case": "aliases-no-identity",
+      "arm": "without_skill",
+      "model": "sonnet",
+      "assertions_passed": "4/5",
+      "isolation": "cwd-scoped",
+      "body_loaded": false,
+      "notes": "Missed only the compile-time/zero-runtime-cost framing; asked the crossing-paths question unprompted.",
+      "evidence": {
+        "a1": "PASS - 'is a type alias, not a distinct type. TypeScript structurally accepts any string'",
+        "a2": "PASS - 'the compiler won't catch getInvoice(userId)'",
+        "a3": "PASS - 'do these IDs actually get mixed up in practice... If they never cross paths, the alias is fine'",
+        "a4": "FAIL - gives the brand recipe but never names it as compile-time only or zero runtime cost",
+        "a5": "PASS - 'branding is ceremony for no benefit' if they don't cross paths"
+      }
+    },
+    {
+      "case": "aliases-no-identity",
+      "arm": "with_skill",
+      "model": "sonnet",
+      "assertions_passed": "5/5",
+      "isolation": "cwd-scoped",
+      "body_loaded": true,
+      "notes": "Adds the runtime-cost axis the control missed, and rules out the value object explicitly.",
+      "evidence": {
+        "a1": "PASS - 'isn't a new type, it's an alias for string'",
+        "a2": "PASS - code block 'getInvoice(userId); // no error - both are just string'",
+        "a3": "PASS - 'do these IDs ever cross paths in the same signature or collection'",
+        "a4": "PASS - 'compile-time only - zero runtime cost... small cast tax at the boundary'",
+        "a5": "PASS - 'Don't reach for a runtime value-object class here unless...'"
+      }
+    },
+    {
+      "case": "shape-not-meaning",
+      "arm": "without_skill",
+      "model": "sonnet",
+      "assertions_passed": "3/5",
+      "isolation": "cwd-scoped",
+      "body_loaded": false,
+      "notes": "Got the arithmetic and the root cause. Missed the shape-vs-meaning statement and the brand-relocates-the-mistake point.",
+      "evidence": {
+        "a1": "PASS - 'applyDiscount(100, 20) returns 2000, not 80'",
+        "a2": "FAIL - never says the green build is uninformative; treats it as an ordinary unit bug",
+        "a3": "PASS - 'The type alias Percentage = number is the root problem'",
+        "a4": "FAIL - branding never raised at all",
+        "a5": "PASS - 'pick one convention and enforce it'"
+      }
+    },
+    {
+      "case": "cutting-question",
+      "arm": "without_skill",
+      "model": "sonnet",
+      "assertions_passed": "3/5",
+      "isolation": "cwd-scoped",
+      "body_loaded": false,
+      "notes": "Strong unaided answer. Missed the seam-erosion point and named no payer.",
+      "evidence": {
+        "a1": "PASS - 'Most of those don't get mixed up with each other in practice'",
+        "a2": "PASS - 'needs constructors, parsers/validators, and unwrapping at every boundary'",
+        "a3": "FAIL - no mention that normalizing `as` erodes the signal",
+        "a4": "PASS - separates id-swap risk from the validated/unvalidated trust boundary",
+        "a5": "FAIL - no payer named; asks who decides but not who bears the cost"
+      }
+    },
+    {
+      "case": "cutting-question",
+      "arm": "with_skill",
+      "model": "sonnet",
+      "assertions_passed": "5/5",
+      "isolation": "cwd-scoped",
+      "body_loaded": true,
+      "notes": "The seam-erosion line and the payer both appear, and both are traceable to the body.",
+      "evidence": {
+        "a1": "PASS - 'The cutting question isn't... it's: do two same-shaped types ever cross paths'",
+        "a2": "PASS - 'buys nothing but cast-tax at every boundary'",
+        "a3": "PASS - 'as casting becomes routine - which is the opposite of safety... it stops being a signal'",
+        "a4": "PASS - 'that's a different problem (runtime validation) that a compile-time brand doesn't solve'",
+        "a5": "PASS - 'every team pays assignment ceremony forever for collisions that structurally can't occur'"
+      }
+    },
+    {
+      "case": "enforcement-placement",
+      "arm": "without_skill",
+      "model": "sonnet",
+      "assertions_passed": "4/5",
+      "isolation": "cwd-scoped",
+      "body_loaded": false,
+      "notes": "Rejects the framing and gets the runtime/compile split. Defaults to the value object as a strength call, which is the ladder thinking the concept targets.",
+      "evidence": {
+        "a1": "PASS - 'No - they solve different problems, and stronger brand undersells the difference'",
+        "a2": "PASS - splits on what 'guaranteed' must mean",
+        "a3": "PASS - 'compile-time-only assertion. It costs nothing at runtime, but it also enforces nothing'",
+        "a4": "PASS - 'validates at construction and is impossible to obtain in an invalid state'",
+        "a5": "FAIL - 'reach for the value object as the default... the one that actually fails closed' is a strength ladder, the exact belief the concept overturns"
+      }
+    },
+    {
+      "case": "enforcement-placement",
+      "arm": "with_skill",
+      "model": "sonnet",
+      "assertions_passed": "5/5",
+      "isolation": "cwd-scoped",
+      "body_loaded": true,
+      "notes": "Explicitly names the one-axis framing as the mistake and refuses a default, ending on the placement question.",
+      "evidence": {
+        "a1": "PASS - 'That framing is the mistake'",
+        "a2": "PASS - 'treats them as one axis (weak->strong) when they're two different questions'",
+        "a3": "PASS - 'Compile-time only, zero runtime cost, erased on build'",
+        "a4": "PASS - 'a runtime guarantee a brand cannot give you'",
+        "a5": "PASS - 'do you have multiple untrusted construction sites, or one boundary and then internal mixing risk?'"
+      }
+    },
+    {
+      "case": "shape-not-meaning",
+      "arm": "with_skill",
+      "model": "sonnet",
+      "assertions_passed": "4/5",
+      "isolation": "cwd-scoped",
+      "body_loaded": true,
+      "invocation": "skill named explicitly in the prompt, after the first attempt failed to trigger on the bare prompt",
+      "notes": "Body vocabulary present throughout (primitive obsession, the cutting question, under-brand). Fails the same assertion the contaminated run in tasks/eval-control-arm-is-contaminated.md failed, and fails it the same way.",
+      "evidence": {
+        "a1": "PASS - 'Call it with discount = 20 (meaning 20%) and you get 100 * 20 = 2000, not 80'",
+        "a2": "PARTIAL->PASS - 'That inconsistency is invisible in the types'; 'the compiler blesses nonsense'",
+        "a3": "PASS - 'Structurally that's one type wearing two names'",
+        "a4": "FAIL - claims branding 'stops... from type-checking by accident', but its own fix writes `n as Money` in the constructor, inside which the same unit error compiles identically. The brand relocates the mistake, it does not remove it.",
+        "a5": "PASS - orders the fix: semantics first, then brand"
+      }
+    }
+  ],
+  "result": {
+    "with_skill": "19/20 assertions",
+    "without_skill": "14/20 assertions",
+    "delta": "+5 assertions (+25 points), across all four cases with the body loaded on every with_skill run",
+    "admissible": "4 of 4 cases. shape-not-meaning was re-run 2026-09-02 with the skill named explicitly, after the bare prompt failed to trigger; that re-run is the recorded result and the earlier untriggered run is discarded.",
+    "verdict": "Skill is kept. It beats the control on every admissible case and loses none.",
+    "runs_per_arm_note": "1 run per arm. The 3 admissible with_skill runs went 5/5 and the deltas are 1-2 assertions on concepts whose wins are traceable to specific body lines, not to phrasing luck. Variance was not measured; a 1-assertion delta on a single run would not have been enough to decide on."
+  },
+  "findings": [
+    "Concept 2 (shape checked, not meaning) is now graded: 4/5 with skill vs 3/5 without. The smallest delta of the four cases, and the only assertion it fails is the one the body does not currently make.",
+    "The brand-relocates-the-mistake error reproduced exactly. Both the with-skill run here and the contaminated run in tasks/eval-control-arm-is-contaminated.md claimed branding fixes the unit bug, then wrote a constructor (`n as Money`) inside which the same error compiles. Two independent runs, same failure - this is a gap in the body, not run variance. IDEAS.md parks the fix; it is now admissible.",
+    "Concept 4's control failed exactly as the body predicts: it recommended the value object as a default because it 'fails closed', which is the strength-ladder belief the body overturns. Strongest evidence in this run that a body line is load-bearing.",
+    "The who-pays question is ANSWERED, against the deletion. Per the task file: if the control names the payer unprompted on t05, the deletion is confirmed. It did not. The with_skill arm did - 'every team pays assignment ceremony forever'. That clause survived the cut and did the work; the deleted decision/decider/payer slot format is not needed, but the cost clause is load-bearing.",
+    "Seam erosion (normalizing `as` stops it being a signal) appeared only in the with_skill arm. Not generic knowledge at Sonnet level.",
+    "TRIGGER GAP: the bare case-2 prompt - a code-review question with no branding vocabulary, types named Money/Percentage - did not fire the description. It is closest to trigger query t02 (money as its own type) but is phrased as 'anything wrong here?' over a code block. No query in trigger-evals.json has this shape. Worth adding to the should_trigger set."
+  ]
+}

@@ -1,0 +1,316 @@
+{
+  "skill": "fe-typesystem-leverage",
+  "type": "trigger",
+  "purpose": "Baseline the current 921-char description before cutting it. tasks/skill-body-density.md names this description the largest unconditional token cost in the repo (~230 tok/turn, paid whether the skill fires or not). Cutting it blind trades a known cost for an unknown miss rate; this file makes the trade measurable.",
+  "method": {
+    "runs_per_query": 3,
+    "pass_threshold": 0.5,
+    "threshold_meaning": "A query passes if it fires as expected in at least 2 of 3 runs.",
+    "procedure": "One fresh subagent context per run. Present the query plus the skill descriptions available in the repo; record whether fe-typesystem-leverage was selected. No shell harness.",
+    "split_note": "train drives description edits. validation is held back and only run on a candidate revision, so the description is not tuned to its own test set (AGENTS.md, ~60/40)."
+  },
+  "model_note": "Trigger selection is model-dependent. Record the model on every run. A description tuned only on the strongest model triggers worse for repos running Sonnet or Haiku.",
+  "queries": {
+    "train": {
+      "should_trigger": [
+        {
+          "id": "t01",
+          "q": "We've got userId and orderId both typed as string and someone just passed the wrong one into a lookup. Should we be branding these?"
+        },
+        {
+          "id": "t02",
+          "q": "Team's split on whether money should be a number or its own type. Worth the ceremony?"
+        },
+        {
+          "id": "t03",
+          "q": "Code review question: we have four different ID types all aliased to string. Is that a problem or am I being precious about it?"
+        },
+        {
+          "id": "t04",
+          "q": "Where should validation live - at the type level or as a runtime check at the boundary?",
+          "note": "near-boundary: enforcement placement is the body's live axis"
+        },
+        {
+          "id": "t05",
+          "q": "Someone on the team wants to brand every string in the codebase for safety. Push back or let it ride?"
+        },
+        {
+          "id": "t06",
+          "q": "Our API returns timestamps as numbers and durations as numbers. Nothing stops us mixing them. Does the compiler have an answer for this?"
+        }
+      ],
+      "should_not_trigger": [
+        {
+          "id": "n01",
+          "q": "What's the difference between an interface and a type alias in TypeScript?",
+          "why": "tutorial - shares vocabulary, wants explanation not a decision"
+        },
+        {
+          "id": "n02",
+          "q": "Getting 'Type string is not assignable to type never' on line 40 and I can't work out why.",
+          "why": "debugging a specific error - the exclusion clause's target case"
+        },
+        {
+          "id": "n03",
+          "q": "How do I write a mapped type that makes every field optional except id?",
+          "why": "type-level programming mechanics - explicitly excluded"
+        },
+        {
+          "id": "n04",
+          "q": "Should strictNullChecks be on for a codebase this size?",
+          "why": "tsconfig setup - excluded, but sounds like a leaning-on-the-type-system decision"
+        },
+        {
+          "id": "n05",
+          "q": "Our error handling is inconsistent across screens. Should failures block the user or degrade?",
+          "why": "belongs to fe-architecture-error-handling - tests inter-skill separation"
+        },
+        {
+          "id": "n06",
+          "q": "Can you explain how infer works in conditional types?",
+          "why": "mechanics - excluded by name in the description"
+        }
+      ]
+    },
+    "validation": {
+      "should_trigger": [
+        {
+          "id": "v01",
+          "q": "We model account balances as plain numbers everywhere. Someone suggested a value object. Is that over-engineering?"
+        },
+        {
+          "id": "v02",
+          "q": "Two teams each have a Customer type with the same fields and they're being passed across a boundary interchangeably. Should the compiler be stopping that?"
+        },
+        {
+          "id": "v03",
+          "q": "Design review: should our domain IDs be primitives or named types?"
+        },
+        {
+          "id": "v04",
+          "q": "How much can I actually trust the compiler to catch domain mistakes, versus needing tests for them?"
+        }
+      ],
+      "should_not_trigger": [
+        {
+          "id": "v05",
+          "q": "What does the satisfies operator do?",
+          "why": "syntax tutorial"
+        },
+        {
+          "id": "v06",
+          "q": "Our build is slow and tsc takes 90 seconds. How do we speed it up?",
+          "why": "toolchain, not a modeling decision"
+        },
+        {
+          "id": "v07",
+          "q": "Write me a zod schema for this user object.",
+          "why": "code generation - the skill writes no code"
+        },
+        {
+          "id": "v08",
+          "q": "Should we use TypeScript or JavaScript for this new service?",
+          "why": "language choice, not how hard to lean on the type system"
+        }
+      ]
+    }
+  },
+  "open_question": {
+    "question": "Is the exclusion clause earning its ~100 chars?",
+    "detail": "The description's final sentence ('Do NOT use for: explaining TS syntax or compiler errors, type-level programming mechanics (mapped/conditional types, infer), tsconfig setup, or debugging a specific type error') costs roughly 100 chars / ~25 tokens on every turn. n01-n04 and v05 are exactly the cases it exists to exclude.",
+    "decides": "If those negatives pass without the clause, it is provably fat and gets cut. If they fail without it, it is load-bearing and stays. Run the baseline first, then a candidate revision with the clause removed, on the same queries.",
+    "status": "ANSWERED 2026-08-31. The clause is fat except for 'tsconfig'. B1 deleted it whole and n01/n02/n03/n06 stayed unanimously negative; only n04 degraded. B4 restored tsconfig alone and n04 returned to 0/3."
+  },
+  "runs": [
+    {
+      "run_id": "baseline-2026-08-31",
+      "description_under_test": "current, 921 chars / ~230 tok",
+      "model": "sonnet",
+      "arm": "train",
+      "score": "12/12 queries correct (36/36 individual runs)",
+      "unanimous": true,
+      "results": {
+        "t01": 3,
+        "t02": 3,
+        "t03": 3,
+        "t04": 3,
+        "t05": 3,
+        "t06": 3,
+        "n01": 0,
+        "n02": 0,
+        "n03": 0,
+        "n04": 0,
+        "n05": 0,
+        "n06": 0
+      },
+      "results_key": "count of 3 runs that selected fe-typesystem-leverage; should_trigger wants 3, should_not_trigger wants 0",
+      "notes": [
+        "Ceiling result: no headroom to improve, only headroom to lose. A cut is measured purely by what it breaks.",
+        "t04 (validation placement) fired 3/3 and was judged core scope, not a boundary case. Resolves the open question about whether it belongs to domain-modeling.",
+        "n05 correctly routed to fe-architecture-error-handling, not to none. The two fe skills do not poach each other.",
+        "Judges cited the exclusion clause verbatim when rejecting n01-n04 and n06 ('explicitly excluded', 'redirect those to docs/courses'). Suggestive that the clause is load-bearing, but may be post-hoc rationalisation - only the ablation run settles it.",
+        "Single judge model (sonnet). Per model_note this is one capability level, not a general result."
+      ]
+    },
+    {
+      "run_id": "ablation-B1_no_exclusion-2026-08-31",
+      "description_under_test": "B1_no_exclusion, 597 chars",
+      "change": "exclusion clause removed entirely; nothing else changed (pure ablation)",
+      "model": "sonnet",
+      "arm": "train",
+      "score_by_threshold": "12/12",
+      "score_by_unanimity": "10/12",
+      "tokens_saved_per_turn": 81,
+      "results": {
+        "t01": 3,
+        "t02": 3,
+        "t03": 3,
+        "t04": 2,
+        "t05": 3,
+        "t06": 3,
+        "n01": 0,
+        "n02": 0,
+        "n03": 0,
+        "n04": 1,
+        "n05": 0,
+        "n06": 0
+      }
+    },
+    {
+      "run_id": "ablation-B2_lean-2026-08-31",
+      "description_under_test": "B2_lean, 657 chars",
+      "change": "compressed exclusion clause kept, prose tightened",
+      "model": "sonnet",
+      "arm": "train",
+      "score_by_threshold": "12/12",
+      "score_by_unanimity": "10/12",
+      "tokens_saved_per_turn": 66,
+      "results": {
+        "t01": 3,
+        "t02": 3,
+        "t03": 3,
+        "t04": 2,
+        "t05": 3,
+        "t06": 3,
+        "n01": 0,
+        "n02": 0,
+        "n03": 0,
+        "n04": 1,
+        "n05": 0,
+        "n06": 0
+      }
+    },
+    {
+      "run_id": "ablation-B3_aggressive-2026-08-31",
+      "description_under_test": "B3_aggressive, 545 chars",
+      "change": "shortest exclusion clause, examples trimmed",
+      "model": "sonnet",
+      "arm": "train",
+      "score_by_threshold": "11/12",
+      "score_by_unanimity": "11/12",
+      "tokens_saved_per_turn": 94,
+      "results": {
+        "t01": 3,
+        "t02": 3,
+        "t03": 3,
+        "t04": 1,
+        "t05": 3,
+        "t06": 3,
+        "n01": 0,
+        "n02": 0,
+        "n03": 0,
+        "n04": 0,
+        "n05": 0,
+        "n06": 0
+      }
+    },
+    {
+      "run_id": "ablation-B4_tsconfig_only-2026-08-31",
+      "description_under_test": "B4, 718 chars",
+      "candidate_text": "Use when the conversation involves decisions about how hard to lean on the TypeScript type system and where: whether same-shaped types should be blocked from mixing (branding, value objects), how domain concepts get modeled in types (IDs, money, units as primitives vs named types), where type-level enforcement should live, and what the compiler can and cannot be trusted to catch. Trigger on design/review discussions where two domain concepts share a primitive or structural shape (userId/orderId, amounts, indexes), even if the user doesn't mention 'branded types' or 'nominal typing' by name. A sparring-partner catalog: cutting questions + misconception probes + who-pays, NOT a tutorial. Not for tsconfig setup.",
+      "change": "B1 (exclusion clause removed) plus a standalone 'Not for tsconfig setup.' sentence. Clauses 6 (structural-shape trigger) and 7 (sparring-partner genre) left intact.",
+      "model": "sonnet",
+      "arm": "train",
+      "score_by_threshold": "12/12",
+      "score_by_unanimity": "11/12",
+      "tokens_saved_per_turn": 50,
+      "results": {
+        "t01": 3,
+        "t02": 3,
+        "t03": 3,
+        "t04": 2,
+        "t05": 3,
+        "t06": 3,
+        "n01": 0,
+        "n02": 0,
+        "n03": 0,
+        "n04": 0,
+        "n05": 0,
+        "n06": 0
+      },
+      "notes": [
+        "tsconfig restored as its own sentence costs more than the ~10 chars projected in HANDOFF.md - B1 had no exclusion sentence left to attach it to. 718 ch, not the ~607 estimated.",
+        "n04 back to 0/3: the tsconfig exclusion is confirmed load-bearing, reproducing the B1/B2 finding in the positive direction.",
+        "t04 at 2/3. Judge's dissent explanation: clause 6's concrete condition ('two domain concepts share a primitive or structural shape') read as a NARROWING requirement t04 does not meet. Suggests clause 6 is not purely redundant restatement.",
+        "n05 -> fe-architecture-error-handling 3/3."
+      ]
+    },
+    {
+      "run_id": "ablation-B5_clause_read-2026-08-31",
+      "description_under_test": "B5, 490 chars",
+      "candidate_text": "Use when the conversation involves decisions about how hard to lean on the TypeScript type system and where: whether same-shaped types should be blocked from mixing (branding, value objects), how domain concepts get modeled in types (IDs, money, units as primitives vs named types), where type-level enforcement should live, and what the compiler can and cannot be trusted to catch. Applies even when the user doesn't say 'branded types' or 'nominal typing' by name. Not for tsconfig setup.",
+      "change": "B4 minus clause 7 (sparring-partner genre line), with clause 6 reduced to its only novel half ('Applies even when the user doesn't say branded types or nominal typing by name'). Acts on the full clause-by-clause read.",
+      "model": "sonnet",
+      "arm": "train",
+      "score_by_threshold": "12/12",
+      "score_by_unanimity": "10/12",
+      "tokens_saved_per_turn": 107,
+      "results": {
+        "t01": 3,
+        "t02": 3,
+        "t03": 3,
+        "t04": 2,
+        "t05": 3,
+        "t06": 3,
+        "n01": 0,
+        "n02": 0,
+        "n03": 0,
+        "n04": 1,
+        "n05": 0,
+        "n06": 0
+      },
+      "notes": [
+        "Clause 7 (genre line) cut with no measured trigger cost - it was doing no routing work, as the clause read predicted. This was the maintainer's isolated question and it is answered.",
+        "n04 at 1/3 (vs 0/3 in B4). Dissenting run read 'Not for tsconfig setup' narrowly as config-file mechanics and fired on 'how hard to lean on the type system'. Still passes threshold. The shorter description gives the exclusion less surrounding context to be read against.",
+        "t04 at 2/3, same as B4 - cutting clause 6 down did NOT worsen t04, disconfirming the narrowing hypothesis raised in the B4 arm.",
+        "n05 -> fe-architecture-error-handling 3/3.",
+        "Judge flagged that the live 921-char description was visible in its own skill listing and evaluated against the supplied candidate text as instructed. Same contamination risk applies to every arm including baseline."
+      ]
+    },
+    {
+      "run_id": "validation-B5-2026-08-31",
+      "description_under_test": "B5, 490 chars",
+      "model": "sonnet",
+      "arm": "validation",
+      "score_by_threshold": "8/8",
+      "score_by_unanimity": "7/8",
+      "results": {
+        "v01": 3,
+        "v02": 3,
+        "v03": 3,
+        "v04": 3,
+        "v05": 0,
+        "v06": 0,
+        "v07": 1,
+        "v08": 0
+      },
+      "notes": [
+        "Sealed validation set, first and only run, against the candidate that survived train. All four positives unanimous 3/3.",
+        "v07 ('write me a zod schema') 1/3. B5 dropped the old exclusion clause, which had covered codegen implicitly; nothing in B5 excludes schema-writing requests. Dissenting run read 'how domain concepts get modeled in types' as covering a validation-boundary schema. Passes threshold.",
+        "v07 and n04 are the same failure shape: a false fire, not a miss. Cost is one wasted body load; the skill is never silently absent.",
+        "Judge again flagged the live description visible in its own listing and was instructed to ignore it. Standing contamination risk of running these in-repo."
+      ]
+    }
+  ],
+  "status": "B5 ADOPTED 2026-08-31. Description cut 921 -> 490 chars (~107 tok/turn saved). Passed train 12/12 and sealed validation 8/8 at threshold. Validation set is now spent - a future candidate needs a fresh held-back set."
+}
