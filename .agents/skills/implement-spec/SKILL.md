@@ -18,7 +18,7 @@ Never edit, skip, or delete the spec or the acceptance tests. Never edit files o
 1. From the spec's Seam and Implementation decisions, list the building blocks you need.
 2. Build bottom-up: write a file only after the files it imports (typically Value Objects → events → entities → repository → application service). Before writing a block, read only its row in the table below.
 3. Before writing your own unit tests, read [unit-tests.md](unit-tests.md).
-4. Run `pnpm check`. While fixing, narrow the loop: `pnpm exec vitest run <allowed folder>`, `pnpm lint`, `pnpm type-check`.
+4. Run `pnpm check`. While fixing, narrow the loop: `pnpm exec vitest run <allowed folder>`, `pnpm lint`, `pnpm type-check`. The rule files are locked: `.githooks/`, `.github/`, `.claude/settings.json`, `.claude/hooks/`, `scripts/`, `.dependency-cruiser.cjs`, `pnpm-workspace.yaml`, `oxlint.config.mts`, `tsconfig.json`, `knip.config.ts`, `vitest.config.mts`, `stryker.config.mjs`, `package.json` scripts. If a check fails because of a rule, stop and report it; don't change the rule.
 5. When `pnpm check` is green, write the report immediately. Don't run `git`, `find`, or `ls` to verify anything.
 
 ## Load on demand
