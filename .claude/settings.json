@@ -3,7 +3,19 @@
     "deny": [
       "Bash(git commit --no-verify *)",
       "Bash(git commit -n *)",
-      "Bash(git push --no-verify *)"
+      "Bash(git push --no-verify *)",
+      "Edit(/.githooks/**)",
+      "Edit(/.github/**)",
+      "Edit(/.claude/settings.json)",
+      "Edit(/.claude/hooks/**)",
+      "Edit(/scripts/**)",
+      "Edit(/.dependency-cruiser.cjs)",
+      "Edit(/pnpm-workspace.yaml)",
+      "Edit(/oxlint.config.mts)",
+      "Edit(/tsconfig.json)",
+      "Edit(/knip.config.ts)",
+      "Edit(/vitest.config.mts)",
+      "Edit(/stryker.config.mjs)"
     ]
   },
   "hooks": {

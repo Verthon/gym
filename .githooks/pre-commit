@@ -1,5 +1,21 @@
 #!/bin/sh
 set -e
+if [ -n "$CLAUDE_CODE_CHILD_SESSION" ]; then
+  locked='^(\.githooks/|\.github/|\.claude/settings\.json$|\.claude/hooks/|scripts/|\.dependency-cruiser\.cjs$|pnpm-workspace\.yaml$|oxlint\.config\.mts$|tsconfig\.json$|knip\.config\.ts$|vitest\.config\.mts$|stryker\.config\.mjs$)'
+  staged=$(git diff --cached --name-only --no-renames | grep -E "$locked" || true)
+  if git cat-file -e HEAD:package.json 2>/dev/null && git cat-file -e :package.json 2>/dev/null; then
+    if [ "$(git show HEAD:package.json | jq -S .scripts)" != "$(git show :package.json | jq -S .scripts)" ]; then
+      staged="$staged
+package.json (scripts)"
+    fi
+  fi
+  if [ -n "$(echo "$staged" | tr -d '[:space:]')" ]; then
+    echo "Commit stages safety-net files from inside Claude Code:" >&2
+    echo "$staged" | sed '/^$/d; s/^/  /' >&2
+    echo "Unstage them (git restore --staged <file>) and report the change to the user. Only the user commits these, from their own terminal." >&2
+    exit 1
+  fi
+fi
 if ! command -v pnpm >/dev/null 2>&1; then
   echo "pnpm not found on PATH ($PATH)." >&2
   echo "Fix the environment so pnpm resolves. Do NOT bypass this hook with --no-verify or by changing core.hooksPath." >&2
