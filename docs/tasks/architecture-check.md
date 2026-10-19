@@ -1,7 +1,7 @@
 # Architecture check
 
 Created: 2026-09-29
-Status: open
+Status: done
 
 ## Goal
 
@@ -84,9 +84,16 @@ Verified 2026-10-18: `money → contracting` and `unsigned-contract → active-c
 
 Trunk-based, no PRs (ADR 0003): every guard runs before the commit. CI-from-`origin/main`, CODEOWNERS and branch protection give no protection here.
 
-- [ ] `.claude/settings.json` deny `Edit`/`Write` on `.dependency-cruiser.cjs` and `pnpm-workspace.yaml` (same as `harness.md` §6)
-- [ ] Block edits through Bash and a commit that stages these files without a human override. Mechanism comes from the safety-net research in `harness.md` §6
-- [ ] Coder skill: list the rule files as locked, next to the step that runs `pnpm check`
+Threat: an agent taking a shortcut to green, not an adversary. The usual spellings are blocked, deliberate evasion isn't (decided 2026-10-19, `harness.md` question 1). No sandbox, no mod.
+
+- [x] `.claude/settings.json` deny `Edit(...)` on the safety-net files: `.githooks/**`, `.github/**`, `.claude/settings.json`, `.claude/hooks/**`, `scripts/**`, `.dependency-cruiser.cjs`, `pnpm-workspace.yaml`, `oxlint.config.mts`, `tsconfig.json`, `knip.config.ts`, `vitest.config.mts`, `stryker.config.mjs`. Not `Write(...)`: Claude Code ignores path rules on `Write`
+- [x] `.githooks/pre-commit` fails when `CLAUDE_CODE_CHILD_SESSION` is set and a safety-net file or the `scripts` field of `package.json` is staged. Human override: commit from your own terminal
+- [x] `block-hook-bypass.sh` narrowed: strips heredoc bodies and quoted strings before matching flags; blocks case-insensitive `core.hookspath` writes, `GIT_CONFIG_*`, `chmod`/`rm`/`mv`/`git checkout` on `.githooks`, and hiding `CLAUDE_CODE_CHILD_SESSION`
+- [x] Coder skill: rule files listed as locked, next to the step that runs `pnpm check`
+
+Verified 2026-10-19: the hook blocks 5 of the 6 bypasses from the `harness.md` probe table plus 12 other spellings. The sixth, `> .githooks/pre-commit`, is denied by the deny rule. `git config core.hooksPath` (read), `--no-verify` inside a commit message or heredoc, `git commit --amend` pass. `printf '' | tee -a tsconfig.json` is denied too. Staged-file check in a scratch repo: `.githooks/pre-commit` and a `scripts` change fail, a non-script `package.json` change passes.
+
+Residual: a hooks-path override hidden from the command string (variable, `sh -c`, a script), and writes by subprocesses (node, python). Not verified: whether `!` commands get `CLAUDE_CODE_CHILD_SESSION`.
 
 ### 4. Out of scope, known gaps
 
