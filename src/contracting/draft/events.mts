@@ -1,5 +1,5 @@
-import type { FeeStructure } from "#/money/FeeStructure.mts";
 import type { PersonId } from "./PersonId.mts";
+import type { OfferFees } from "./OfferSnapshot.mts";
 
 /** Internal BC event (can use VO + LocalDate) */
 export type ContractPrepared = Readonly<{
@@ -7,7 +7,7 @@ export type ContractPrepared = Readonly<{
 	occurredAt: Temporal.Instant;
 	payload: Readonly<{
 		personId: PersonId;
-		fees: FeeStructure;
+		fees: OfferFees;
 	}>;
 }>;
 

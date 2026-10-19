@@ -55,7 +55,7 @@ The acceptance driver compiles against these shapes. Changing them means a new s
 
 Module: `src/contracting/draft/index.mts` is the stage's public module. This is the one file path the spec pins, because the locked driver imports it.
 
-It exports:
+It exports the names the driver imports: `OfferView`, `OfferReadModel`, `CustomerView`, `CustomerReadModel`, `InMemoryContractDraftRepository`, `createContractDraft`, `prepareContract`, `contractStatus`. `Money` and `ContractDraftRepository` below are shapes, not exports; `drafts` is whatever port `InMemoryContractDraftRepository` implements.
 
 ```ts
 type Money = { amountMinor: number; currency: string };
@@ -75,8 +75,7 @@ interface OfferReadModel { findOffer(offerId: string): Promise<OfferView | null>
 type CustomerView = { customerId: string; birthDate: string };
 interface CustomerReadModel { findCustomer(customerId: string): Promise<CustomerView | null> }
 
-interface ContractDraftRepository { /* shape is the coder's choice */ }
-class InMemoryContractDraftRepository implements ContractDraftRepository { constructor() }
+class InMemoryContractDraftRepository { constructor() }
 
 const createContractDraft: (deps: {
   drafts: ContractDraftRepository;

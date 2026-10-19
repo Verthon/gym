@@ -11,8 +11,7 @@ type GovernmentIdInfoProps = {
 
 type GovernmentIdInfoError =
 	| { code: "INVALID_TYPE"; context: { type: string } }
-	| { code: "INVALID_NUMBER"; context: { number: string } }
-	| { code: "EXPIRED"; context: { expiryDate: LocalDate } };
+	| { code: "INVALID_NUMBER"; context: { number: string } };
 
 export class GovernmentIdInfo {
 	private readonly props: GovernmentIdInfoProps;
@@ -22,8 +21,7 @@ export class GovernmentIdInfo {
 	}
 
 	public static create(
-		props: GovernmentIdInfoProps,
-		asOf: LocalDate
+		props: GovernmentIdInfoProps
 	):
 		| { success: true; value: GovernmentIdInfo }
 		| { success: false; error: GovernmentIdInfoError } {
@@ -37,12 +35,6 @@ export class GovernmentIdInfo {
 			return {
 				success: false,
 				error: { code: "INVALID_NUMBER", context: { number: props.number } },
-			};
-		}
-		if (props.expiryDate && props.expiryDate.isBefore(asOf)) {
-			return {
-				success: false,
-				error: { code: "EXPIRED", context: { expiryDate: props.expiryDate } },
 			};
 		}
 		return { success: true, value: new GovernmentIdInfo(props) };

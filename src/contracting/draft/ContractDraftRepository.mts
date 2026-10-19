@@ -1,18 +1,26 @@
+import { ContractId } from "./ContractId.mts";
 import type { ContractDraft } from "./ContractDraft.mts";
 
 export interface ContractDraftRepository {
-  get(id: string): Promise<ContractDraft | null>;
-  save(id: string, draft: ContractDraft): Promise<void>;
+	nextId(): ContractId;
+	get(id: ContractId): Promise<ContractDraft | null>;
+	save(draft: ContractDraft): Promise<void>;
 }
 
-export class InMemoryContractDraftRepository
-  implements ContractDraftRepository
-{
-  private store = new Map<string, ContractDraft>();
-  async get(id: string) {
-    return this.store.get(id) ?? null;
-  }
-  async save(id: string, draft: ContractDraft) {
-    this.store.set(id, draft);
-  }
+export class InMemoryContractDraftRepository implements ContractDraftRepository {
+	private store = new Map<string, ContractDraft>();
+
+	nextId(): ContractId {
+		const created = ContractId.create(crypto.randomUUID());
+		if (!created.success) throw new Error("generated contract id is empty");
+		return created.value;
+	}
+
+	async get(id: ContractId) {
+		return this.store.get(id.toString()) ?? null;
+	}
+
+	async save(draft: ContractDraft) {
+		this.store.set(draft.id.toString(), draft);
+	}
 }

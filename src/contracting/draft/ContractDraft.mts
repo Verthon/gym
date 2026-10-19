@@ -1,109 +1,108 @@
-import { LocalDate } from "#/utils/LocalDate.mts";
-import type { GovernmentIdInfo } from "./GovernmentIdInfo.mts";
+import type { LocalDate } from "#/utils/LocalDate.mts";
+import { err, okVoid, type Result } from "#/utils/Result.mts";
 import type { BirthDate } from "./BirthDate.mts";
-import type { GuardianCoSignature } from "./GuardianCoSignature.mts";
-import type { PersonId } from "./PersonId.mts";
-import type { FeeStructure } from "#/money/FeeStructure.mts";
+import type { ContractId } from "./ContractId.mts";
 import { contractPrepared, type ContractPrepared } from "./events.mts";
-import { okVoid } from "#/utils/Result.mts";
+import type { GovernmentIdInfo } from "./GovernmentIdInfo.mts";
+import type { GuardianCoSignature } from "./GuardianCoSignature.mts";
+import type { OfferFees, OfferSnapshot } from "./OfferSnapshot.mts";
+import type { PersonId } from "./PersonId.mts";
 
-type DraftStatus = "Draft" | "ReadyToSign";
+type DraftState = { kind: "Draft" } | { kind: "Unsigned" };
+
+export type ContractDraftStatus = DraftState["kind"];
+
 export type ContractDraftProps = {
-  offer: { fees: FeeStructure };
-  userInfo: {
-    personId: PersonId;
-    birthDate: BirthDate;
-    governmentId: GovernmentIdInfo;
-  };
+	id: ContractId;
+	offer: OfferSnapshot;
+	userInfo: {
+		personId: PersonId;
+		birthDate: BirthDate;
+		governmentId: GovernmentIdInfo;
+		governmentIdAttested: boolean;
+	};
+	guardianCoSignature?: GuardianCoSignature;
 };
 
 export type ContractDraftError =
-  | { code: "INVALID_STATUS" }
-  | { code: "MINOR_REQUIRES_GUARDIAN" }
-  | { code: "GUARDIAN_FOR_DIFFERENT_MINOR" }
-  | {
-      code: "ID_EXPIRED_AT_PROMOTION";
-      context: { expiry: LocalDate; asOf: LocalDate };
-    };
+	| { code: "ALREADY_PREPARED" }
+	| { code: "ID_NOT_ATTESTED" }
+	| { code: "ID_EXPIRED"; context: { expiry: LocalDate; asOf: LocalDate } }
+	| { code: "MINOR_REQUIRES_GUARDIAN" }
+	| { code: "GUARDIAN_FOR_DIFFERENT_MINOR" }
+	| { code: "NEGATIVE_FEE" };
 
-/**
- * Represents the initial stage of a contract, where information is gathered and validated.
- */
+const hasNegativeFee = (fees: OfferFees): boolean =>
+	fees.monthlyDues.getAmountMinor() < 0 ||
+	fees.enrollmentFee.getAmountMinor() < 0 ||
+	fees.penalties.some((p) => p.amount.getAmountMinor() < 0);
+
 export class ContractDraft {
-  private _props: ContractDraftProps;
-  private _status: DraftStatus;
-  private _events: ContractPrepared[] = [];
+	private readonly props: ContractDraftProps;
+	private state: DraftState = { kind: "Draft" };
+	private events: ContractPrepared[] = [];
 
-  private constructor(props: ContractDraftProps) {
-    this._props = props;
-    this._status = "Draft";
-  }
+	private constructor(props: ContractDraftProps) {
+		this.props = props;
+	}
 
-  static create(
-    props: ContractDraftProps
-  ):
-    | { success: true; value: ContractDraft }
-    | { success: false; error: { code: string } } {
-    return { success: true, value: new ContractDraft(props) };
-  }
+	static create(props: ContractDraftProps): ContractDraft {
+		return new ContractDraft(props);
+	}
 
-  public toNotSignedContract(
-    { at, asOf }: { at: Temporal.Instant; asOf: LocalDate },
-    guardian?: GuardianCoSignature
-  ):
-    | ReturnType<typeof okVoid>
-    | { success: false; error: ContractDraftError } {
-    if (this._status !== "Draft")
-      return { success: false, error: { code: "INVALID_STATUS" } };
+	public prepare({
+		at,
+		asOf,
+	}: {
+		at: Temporal.Instant;
+		asOf: LocalDate;
+	}): Result<void, ContractDraftError> {
+		if (this.state.kind !== "Draft") return err({ code: "ALREADY_PREPARED" });
 
-    const gov = this._props.userInfo.governmentId;
-    const expiry = gov.getExpiryDate();
-    if (expiry && expiry.isBefore(asOf)) {
-      return {
-        success: false,
-        error: { code: "ID_EXPIRED_AT_PROMOTION", context: { expiry, asOf } },
-      };
-    }
+		const { userInfo, offer, guardianCoSignature } = this.props;
 
-    const isAdult = this._props.userInfo.birthDate.isAtLeast(18, asOf);
-    if (!isAdult) {
-      if (!guardian)
-        return { success: false, error: { code: "MINOR_REQUIRES_GUARDIAN" } };
-      if (!guardian.getMinorId().equals(this._props.userInfo.personId)) {
-        return {
-          success: false,
-          error: { code: "GUARDIAN_FOR_DIFFERENT_MINOR" },
-        };
-      }
-    }
+		if (!userInfo.governmentIdAttested) return err({ code: "ID_NOT_ATTESTED" });
 
-    this._status = "ReadyToSign";
-    this._events.push(
-      contractPrepared(
-        {
-          personId: this._props.userInfo.personId,
-          fees: this._props.offer.fees,
-        },
-        at
-      )
-    );
+		const expiry = userInfo.governmentId.getExpiryDate();
+		if (expiry?.isBefore(asOf)) {
+			return err({ code: "ID_EXPIRED", context: { expiry, asOf } });
+		}
 
-    return okVoid();
-  }
+		if (!userInfo.birthDate.isAtLeast(18, asOf)) {
+			if (!guardianCoSignature) return err({ code: "MINOR_REQUIRES_GUARDIAN" });
+			if (!guardianCoSignature.getMinorId().equals(userInfo.personId)) {
+				return err({ code: "GUARDIAN_FOR_DIFFERENT_MINOR" });
+			}
+		}
 
-  public status(): DraftStatus {
-    return this._status;
-  }
-  public fees(): FeeStructure {
-    return this._props.offer.fees;
-  }
-  public userId(): PersonId {
-    return this._props.userInfo.personId;
-  }
+		if (hasNegativeFee(offer.fees)) return err({ code: "NEGATIVE_FEE" });
 
-  public pullEvents(): ContractPrepared[] {
-    const out = this._events;
-    this._events = [];
-    return out;
-  }
+		this.state = { kind: "Unsigned" };
+		this.events.push(
+			contractPrepared({ personId: userInfo.personId, fees: offer.fees }, at)
+		);
+		return okVoid();
+	}
+
+	public pullEvents(): ContractPrepared[] {
+		const out = this.events;
+		this.events = [];
+		return out;
+	}
+
+	get id(): ContractId {
+		return this.props.id;
+	}
+
+	get status(): ContractDraftStatus {
+		return this.state.kind;
+	}
+
+	get fees(): OfferFees {
+		return this.props.offer.fees;
+	}
+
+	get personId(): PersonId {
+		return this.props.userInfo.personId;
+	}
 }
