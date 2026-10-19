@@ -58,6 +58,7 @@ export default defineConfig({
       },
       rules: {
         "no-console": "off", // console output is fine in tests
+        "vitest/no-disabled-tests": "error",
         "vitest/expect-expect": [
           "error",
           { assertFunctionNames: ["expect", "failWith"] },

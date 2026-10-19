@@ -15,5 +15,6 @@ serve({
   fetch: app.fetch,
   port: 3000
 }, (info) => {
+  // oxlint-disable-next-line no-console -- startup banner; no logger wired yet
   console.log(`Server is running on http://localhost:${info.port}`)
 })

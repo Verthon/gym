@@ -8,7 +8,9 @@ const run = spawnSync("node_modules/.bin/depcruise", ["src", "--output-type", "j
 });
 
 if (run.error !== undefined || run.stdout === "") {
+  // oxlint-disable-next-line no-console -- CLI check reports failure to stderr
   console.error(run.error?.message ?? run.stderr);
+  // oxlint-disable-next-line no-console -- CLI check reports failure to stderr
   console.error("depcruise did not run. Run pnpm install.");
   process.exit(1);
 }
@@ -18,6 +20,7 @@ const isCruiseResult = (value: unknown): value is ICruiseResult =>
 
 const parsed: unknown = JSON.parse(run.stdout);
 if (!isCruiseResult(parsed)) {
+  // oxlint-disable-next-line no-console -- CLI check reports failure to stderr
   console.error("depcruise output is not a cruise result.");
   process.exit(1);
 }
@@ -49,6 +52,7 @@ if (missed.length > 0) {
 }
 
 if (problems.length > 0) {
+  // oxlint-disable-next-line no-console -- CLI check reports failure to stderr
   console.error(problems.join("\n"));
   process.exit(1);
 }

@@ -3,6 +3,7 @@ import { globSync } from "node:fs";
 const offenders = globSync("src/**/*.{js,mjs,cjs}");
 
 if (offenders.length > 0) {
+  // oxlint-disable-next-line no-console -- CLI check reports failure to stderr
   console.error(
     [
       `Found ${offenders.length} JavaScript file(s) in src/:`,
