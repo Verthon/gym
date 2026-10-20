@@ -5,7 +5,7 @@ import { FeeStructure } from "#/money/FeeStructure.mts";
 import { MonthlyDues } from "#/money/MonthlyDues.mts";
 import { Money } from "#/money/Money.mts";
 import { EnrollmentFee } from "#/money/EnrollmentFee.mts";
-import { success } from "#/utils/test.mts";
+import { failWith, success } from "#/utils/test.mts";
 
 const at = Temporal.Instant.from("2025-09-13T10:00:00Z");
 
@@ -21,7 +21,7 @@ describe("SignedContract - success paths", () => {
         const fees = success(FeeStructure.create(monthly, enrollment, []));
         const signedContract = SignedContract.create({ personId, fees });
 
-        signedContract.recordPaymentAccepted({ paymentRef: "PAY-12345", at });
+        success(signedContract.recordPaymentAccepted({ paymentRef: "PAY-12345", at }));
         
         const eventsAfterPayment = signedContract.pullEvents();
         expect(eventsAfterPayment).toEqual([
@@ -37,7 +37,7 @@ describe("SignedContract - success paths", () => {
             },
         ]);
 
-        signedContract.toActiveContract(at);
+        success(signedContract.toActiveContract(at));
         
         const eventsAfterActivation = signedContract.pullEvents();
         expect(eventsAfterActivation).toEqual([
@@ -68,7 +68,9 @@ describe("SignedContract - success paths", () => {
         const fees = success(FeeStructure.create(monthly, enrollment, []));
         const signedContract = SignedContract.create({ personId, fees });
 
-        signedContract.recordPaymentRejected({ reason: "Insufficient funds", at });
+        success(
+            signedContract.recordPaymentRejected({ reason: "Insufficient funds", at })
+        );
 
         expect(signedContract.pullEvents()).toEqual([
             {
@@ -97,7 +99,7 @@ describe("SignedContract - validation", () => {
         const fees = success(FeeStructure.create(monthly, enrollment, []));
         const signedContract = SignedContract.create({ personId, fees });
 
-        signedContract.toActiveContract(at);
+        failWith(signedContract.toActiveContract(at), "PAYMENT_NOT_ACCEPTED");
 
         expect(signedContract.pullEvents()).toEqual([]);
     });
@@ -113,11 +115,70 @@ describe("SignedContract - validation", () => {
         const fees = success(FeeStructure.create(monthly, enrollment, []));
         const signedContract = SignedContract.create({ personId, fees });
 
-        signedContract.recordPaymentRejected({ reason: "Card declined", at });
-        signedContract.toActiveContract(at);
+        success(
+            signedContract.recordPaymentRejected({ reason: "Card declined", at })
+        );
+        failWith(signedContract.toActiveContract(at), "PAYMENT_NOT_ACCEPTED");
 
         const events = signedContract.pullEvents();
         expect(events).toHaveLength(1);
         expect(events[0]?.type).toBe("PaymentFailed");
+    });
+});
+
+const newContract = () => {
+    const personId = success(PersonId.create("person-321"));
+    const monthly = success(
+        MonthlyDues.create(success(Money.fromMajor("10.00", "EUR")))
+    );
+    const enrollment = success(
+        EnrollmentFee.create(success(Money.fromMajor("99.00", "EUR")))
+    );
+    const fees = success(FeeStructure.create(monthly, enrollment, []));
+    return SignedContract.create({ personId, fees });
+};
+
+describe("SignedContract - rejected transitions", () => {
+    it("rejects accepting a payment twice", () => {
+        const contract = newContract();
+        success(contract.recordPaymentAccepted({ paymentRef: "PAY-1", at }));
+        contract.pullEvents();
+
+        failWith(
+            contract.recordPaymentAccepted({ paymentRef: "PAY-2", at }),
+            "NOT_AWAITING_PAYMENT"
+        );
+        expect(contract.pullEvents()).toEqual([]);
+    });
+
+    it("rejects rejecting a payment after it was accepted", () => {
+        const contract = newContract();
+        success(contract.recordPaymentAccepted({ paymentRef: "PAY-1", at }));
+        contract.pullEvents();
+
+        failWith(contract.recordPaymentRejected({ at }), "NOT_AWAITING_PAYMENT");
+        expect(contract.pullEvents()).toEqual([]);
+    });
+
+    it("rejects accepting a payment after it was rejected", () => {
+        const contract = newContract();
+        success(contract.recordPaymentRejected({ at }));
+        contract.pullEvents();
+
+        failWith(
+            contract.recordPaymentAccepted({ paymentRef: "PAY-1", at }),
+            "NOT_AWAITING_PAYMENT"
+        );
+        expect(contract.pullEvents()).toEqual([]);
+    });
+
+    it("rejects activating an already active contract", () => {
+        const contract = newContract();
+        success(contract.recordPaymentAccepted({ paymentRef: "PAY-1", at }));
+        success(contract.toActiveContract(at));
+        contract.pullEvents();
+
+        failWith(contract.toActiveContract(at), "PAYMENT_NOT_ACCEPTED");
+        expect(contract.pullEvents()).toEqual([]);
     });
 });

@@ -1,3 +1,4 @@
+import { err, okVoid, type Result } from "#/utils/Result.mts";
 import { PersonId } from "../draft/PersonId.mts";
 import { FeeStructure } from "#/money/FeeStructure.mts";
 import {
@@ -11,6 +12,10 @@ export type SignedContractProps = {
   personId: PersonId;
   fees: FeeStructure;
 };
+
+export type SignedContractError =
+  | { code: "NOT_AWAITING_PAYMENT" }
+  | { code: "PAYMENT_NOT_ACCEPTED" };
 
 type SignedState =
   | { kind: "AwaitingPayment" }
@@ -31,8 +36,11 @@ export class SignedContract {
     return new SignedContract(props);
   }
 
-  public toActiveContract(at: Temporal.Instant) {
-    if (this.state.kind !== "PaymentAccepted") return;
+  public toActiveContract(
+    at: Temporal.Instant
+  ): Result<void, SignedContractError> {
+    if (this.state.kind !== "PaymentAccepted")
+      return err({ code: "PAYMENT_NOT_ACCEPTED" });
     this.state = { kind: "Active" };
     this.events.push(
       contractStarted(
@@ -43,10 +51,15 @@ export class SignedContract {
         at
       )
     );
+    return okVoid();
   }
 
-  public recordPaymentAccepted(args: { paymentRef: string; at: Temporal.Instant }) {
-    if (this.state.kind !== "AwaitingPayment") return;
+  public recordPaymentAccepted(args: {
+    paymentRef: string;
+    at: Temporal.Instant;
+  }): Result<void, SignedContractError> {
+    if (this.state.kind !== "AwaitingPayment")
+      return err({ code: "NOT_AWAITING_PAYMENT" });
     this.state = { kind: "PaymentAccepted", paymentRef: args.paymentRef };
     this.events.push(
       paymentConfirmed(
@@ -57,10 +70,15 @@ export class SignedContract {
         args.at
       )
     );
+    return okVoid();
   }
 
-  public recordPaymentRejected(args: { reason?: string; at: Temporal.Instant }) {
-    if (this.state.kind !== "AwaitingPayment") return;
+  public recordPaymentRejected(args: {
+    reason?: string;
+    at: Temporal.Instant;
+  }): Result<void, SignedContractError> {
+    if (this.state.kind !== "AwaitingPayment")
+      return err({ code: "NOT_AWAITING_PAYMENT" });
     this.state = { kind: "PaymentRejected", reason: args.reason };
     this.events.push(
       paymentFailed(
@@ -71,6 +89,7 @@ export class SignedContract {
         args.at
       )
     );
+    return okVoid();
   }
 
   public pullEvents(): SignedContractEvent[] {
