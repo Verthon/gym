@@ -1,18 +1,21 @@
 import { describe, it, expect } from "vitest";
 import { ActiveContract } from "../ActiveContract.mts";
-import { success } from "#/utils/test.mts";
+import { failWith, success } from "#/utils/test.mts";
 import { PersonId } from "#/contracting/draft/PersonId.mts";
 
 const at = Temporal.Instant.from("2025-09-13T10:00:00Z");
+const later = Temporal.Instant.from("2025-09-14T10:00:00Z");
+
+const activeContract = () =>
+  ActiveContract.create({ personId: success(PersonId.create("person-123")) });
 
 describe("ActiveContract", () => {
   it("dispatches a ContractSuspended event when suspended", () => {
-    const personId = success(PersonId.create("person-123"));
-    const activeContract = ActiveContract.create({ personId });
+    const contract = activeContract();
 
-    activeContract.suspend(at);
+    success(contract.suspend(at));
 
-    expect(activeContract.pullEvents()).toEqual([
+    expect(contract.pullEvents()).toEqual([
       {
         occurredAt: at,
         payload: {
@@ -23,5 +26,14 @@ describe("ActiveContract", () => {
         type: "ContractSuspended",
       },
     ]);
+  });
+
+  it("rejects suspending an already suspended contract", () => {
+    const contract = activeContract();
+    success(contract.suspend(at));
+    contract.pullEvents();
+
+    failWith(contract.suspend(later), "ALREADY_SUSPENDED");
+    expect(contract.pullEvents()).toEqual([]);
   });
 });
