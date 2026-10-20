@@ -1,8 +1,10 @@
 import { err, okVoid, type Result } from "#/utils/Result.mts";
 import { PersonId } from "../draft/PersonId.mts";
+import type { ActiveContractId } from "./ActiveContractId.mts";
 import { contractSuspended, type ContractSuspended } from "./events.mts";
 
 export type ActiveContractProps = {
+  id: ActiveContractId;
   personId: PersonId;
 };
 
@@ -23,6 +25,10 @@ export class ActiveContract {
 
   public static create(props: ActiveContractProps): ActiveContract {
     return new ActiveContract(props);
+  }
+
+  public get id(): ActiveContractId {
+    return this.props.id;
   }
 
   public suspend(at: Temporal.Instant): Result<void, ActiveContractError> {
