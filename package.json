@@ -1,5 +1,6 @@
 {
   "name": "gym",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#/*": "./src/*"
