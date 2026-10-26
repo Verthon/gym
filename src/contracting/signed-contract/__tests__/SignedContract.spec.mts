@@ -5,9 +5,11 @@ import { FeeStructure } from "#/money/FeeStructure.mts";
 import { MonthlyDues } from "#/money/MonthlyDues.mts";
 import { Money } from "#/money/Money.mts";
 import { EnrollmentFee } from "#/money/EnrollmentFee.mts";
+import { LocalDate } from "#/utils/LocalDate.mts";
 import { failWith, success } from "#/utils/test.mts";
 
 const at = Temporal.Instant.from("2025-09-13T10:00:00Z");
+const startDate = LocalDate.fromISO("2025-09-13");
 
 describe("SignedContract - success paths", () => {
     it("records accepted payment and transitions to active contract", () => {
@@ -19,7 +21,7 @@ describe("SignedContract - success paths", () => {
             EnrollmentFee.create(success(Money.fromMajor("99.00", "EUR")))
         );
         const fees = success(FeeStructure.create(monthly, enrollment, []));
-        const signedContract = SignedContract.create({ personId, fees });
+        const signedContract = SignedContract.create({ personId, fees, durationInMonths: 12 });
 
         success(signedContract.recordPaymentAccepted({ paymentRef: "PAY-12345", at }));
         
@@ -37,7 +39,7 @@ describe("SignedContract - success paths", () => {
             },
         ]);
 
-        success(signedContract.toActiveContract(at));
+        success(signedContract.toActiveContract(at, startDate));
         
         const eventsAfterActivation = signedContract.pullEvents();
         expect(eventsAfterActivation).toEqual([
@@ -51,6 +53,8 @@ describe("SignedContract - success paths", () => {
                         enrollmentFee: expect.any(Object),
                         monthlyDues: expect.any(Object),
                     }),
+                    startDate,
+                    endDate: LocalDate.fromISO("2026-09-13"),
                 },
                 type: "ContractStarted",
             },
@@ -66,7 +70,7 @@ describe("SignedContract - success paths", () => {
             EnrollmentFee.create(success(Money.fromMajor("50.00", "EUR")))
         );
         const fees = success(FeeStructure.create(monthly, enrollment, []));
-        const signedContract = SignedContract.create({ personId, fees });
+        const signedContract = SignedContract.create({ personId, fees, durationInMonths: 12 });
 
         success(
             signedContract.recordPaymentRejected({ reason: "Insufficient funds", at })
@@ -97,9 +101,9 @@ describe("SignedContract - validation", () => {
             EnrollmentFee.create(success(Money.fromMajor("75.00", "EUR")))
         );
         const fees = success(FeeStructure.create(monthly, enrollment, []));
-        const signedContract = SignedContract.create({ personId, fees });
+        const signedContract = SignedContract.create({ personId, fees, durationInMonths: 12 });
 
-        failWith(signedContract.toActiveContract(at), "PAYMENT_NOT_ACCEPTED");
+        failWith(signedContract.toActiveContract(at, startDate), "PAYMENT_NOT_ACCEPTED");
 
         expect(signedContract.pullEvents()).toEqual([]);
     });
@@ -113,12 +117,12 @@ describe("SignedContract - validation", () => {
             EnrollmentFee.create(success(Money.fromMajor("100.00", "EUR")))
         );
         const fees = success(FeeStructure.create(monthly, enrollment, []));
-        const signedContract = SignedContract.create({ personId, fees });
+        const signedContract = SignedContract.create({ personId, fees, durationInMonths: 12 });
 
         success(
             signedContract.recordPaymentRejected({ reason: "Card declined", at })
         );
-        failWith(signedContract.toActiveContract(at), "PAYMENT_NOT_ACCEPTED");
+        failWith(signedContract.toActiveContract(at, startDate), "PAYMENT_NOT_ACCEPTED");
 
         const events = signedContract.pullEvents();
         expect(events).toHaveLength(1);
@@ -135,7 +139,7 @@ const newContract = () => {
         EnrollmentFee.create(success(Money.fromMajor("99.00", "EUR")))
     );
     const fees = success(FeeStructure.create(monthly, enrollment, []));
-    return SignedContract.create({ personId, fees });
+    return SignedContract.create({ personId, fees, durationInMonths: 12 });
 };
 
 describe("SignedContract - rejected transitions", () => {
@@ -175,10 +179,10 @@ describe("SignedContract - rejected transitions", () => {
     it("rejects activating an already active contract", () => {
         const contract = newContract();
         success(contract.recordPaymentAccepted({ paymentRef: "PAY-1", at }));
-        success(contract.toActiveContract(at));
+        success(contract.toActiveContract(at, startDate));
         contract.pullEvents();
 
-        failWith(contract.toActiveContract(at), "PAYMENT_NOT_ACCEPTED");
+        failWith(contract.toActiveContract(at, startDate), "PAYMENT_NOT_ACCEPTED");
         expect(contract.pullEvents()).toEqual([]);
     });
 });

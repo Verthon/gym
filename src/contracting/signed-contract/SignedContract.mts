@@ -1,5 +1,6 @@
 import { err, okVoid, type Result } from "#/utils/Result.mts";
 import { PersonId } from "../draft/PersonId.mts";
+import type { LocalDate } from "#/utils/LocalDate.mts";
 import { FeeStructure } from "#/money/FeeStructure.mts";
 import {
   paymentConfirmed,
@@ -11,6 +12,7 @@ import {
 export type SignedContractProps = {
   personId: PersonId;
   fees: FeeStructure;
+  durationInMonths: number;
 };
 
 export type SignedContractError =
@@ -37,7 +39,8 @@ export class SignedContract {
   }
 
   public toActiveContract(
-    at: Temporal.Instant
+    at: Temporal.Instant,
+    startDate: LocalDate
   ): Result<void, SignedContractError> {
     if (this.state.kind !== "PaymentAccepted")
       return err({ code: "PAYMENT_NOT_ACCEPTED" });
@@ -47,6 +50,8 @@ export class SignedContract {
         {
           personId: this.props.personId,
           fees: this.props.fees,
+          startDate,
+          endDate: startDate.plusMonths(this.props.durationInMonths),
         },
         at
       )

@@ -129,6 +129,7 @@ Divergences between the book and the pre-existing model, resolved 2026-09-28.
 - ID verification attestation not modeled (FR-C05).
 - `SignedContract` treats Payment Failed as terminal (FR-C12).
 - Start policy implicit (FR-C13).
-- Signing window, end date and minimum commitment not modeled (FR-C09, FR-C14, FR-C15).
+- Signing window and minimum commitment not modeled (FR-C09, FR-C15).
+- End date is computed in `SignedContract` but the duration is not yet passed in from the draft; no orchestrator exists (FR-C14).
 - `ContractSuspended` exists without requirement (D3).
 - `docs/domain.md` still lists pass registration rules under Active Contract (D4).

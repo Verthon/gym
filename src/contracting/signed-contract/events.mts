@@ -1,4 +1,5 @@
 import type { FeeStructure } from "#/money/FeeStructure.mts";
+import type { LocalDate } from "#/utils/LocalDate.mts";
 import type { PersonId } from "../draft/PersonId.mts";
 
 export type PaymentConfirmed = Readonly<{
@@ -43,6 +44,8 @@ export type ContractStarted = Readonly<{
     payload: Readonly<{
         personId: PersonId;
         fees: FeeStructure;
+        startDate: LocalDate;
+        endDate: LocalDate;
     }>;
 }>;
 
