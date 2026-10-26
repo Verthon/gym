@@ -31,7 +31,7 @@
     "mutation": "stryker run",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "check": "pnpm check:no-js && pnpm lint && pnpm type-check && pnpm arch && pnpm run test:unit",
+    "check": "pnpm check:no-js && pnpm lint && pnpm type-check && pnpm arch && pnpm run test:unit && pnpm scan:deadcode",
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },
   "dependencies": {

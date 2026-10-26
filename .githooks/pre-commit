@@ -25,3 +25,4 @@ pnpm check:no-js
 pnpm lint
 pnpm type-check
 pnpm arch
+pnpm scan:deadcode
