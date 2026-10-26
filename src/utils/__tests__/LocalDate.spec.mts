@@ -51,3 +51,13 @@ describe("LocalDate.fromISO", () => {
 		expect(() => LocalDate.fromISO("2025-02-30")).toThrow(RangeError);
 	});
 });
+
+describe("LocalDate.plusMonths", () => {
+	it("adds calendar months", () => {
+		expect(LocalDate.fromISO("2025-09-13").plusMonths(12).toISO()).toBe("2026-09-13");
+	});
+
+	it("clamps to the last day of a shorter month", () => {
+		expect(LocalDate.fromISO("2025-01-31").plusMonths(1).toISO()).toBe("2025-02-28");
+	});
+});

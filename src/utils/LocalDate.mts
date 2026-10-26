@@ -25,6 +25,10 @@ export class LocalDate {
 		return new LocalDate(this.value.add({ days }));
 	}
 
+	public plusMonths(months: number): LocalDate {
+		return new LocalDate(this.value.add({ months }));
+	}
+
 	public toISO(): string {
 		return this.value.toString();
 	}
