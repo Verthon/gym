@@ -3,13 +3,13 @@ import { describe, it, expect } from "vitest";
 import { Clock } from "#/utils/Clock.mts";
 import { PersonId } from "#/contracting/draft/PersonId.mts";
 import { failWith, success } from "#/utils/test.mts";
-import { ActiveContract } from "../ActiveContract.mts";
-import { ActiveContractId } from "../ActiveContractId.mts";
+import type { ActiveContractRepository } from "../ActiveContractRepository.mts";
 import {
+  ActiveContract,
+  ActiveContractId,
   InMemoryActiveContractRepository,
-  type ActiveContractRepository,
-} from "../ActiveContractRepository.mts";
-import { suspendActiveContract } from "../ActiveContractService.mts";
+  suspendActiveContract,
+} from "../index.mts";
 
 const clock = Clock.fixed("2026-10-19T10:00:00Z", "Europe/Warsaw");
 
