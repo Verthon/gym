@@ -38,14 +38,18 @@ Some docs end with reference implementations. Open one only if the doc's pattern
 
 Stop immediately and report when:
 
+- a hook, a permission rule, or a git hook blocks a command or an edit;
+- a check can't pass without changing a rule file;
 - a locked file looks wrong (fails lint, contradicts the spec, can't pass);
 - a fix needs a change outside the allowed folder;
 - the same check fails 3 times in a row with the same error;
 - the spec leaves a decision open that changes behavior.
 
+When a guard blocks you, don't reach the same result another way: no other spelling, flag, tool, script, or change to the test or the rule. Commands after the blocked one in the same chain did not run, so don't assume their effects. If you can ask the user (AskUserQuestion), ask; otherwise end the run with the report.
+
 ## Report
 
 - Done: files created, one line each.
 - `pnpm check`: green, or the failing command and its first error.
-- Stopped on: `file:line`, cause, up to two proposed fixes. Omit if you didn't stop.
+- Stopped on: `file:line`, cause, the guard's message verbatim if a guard blocked you, up to two proposed fixes. Omit if you didn't stop.
 - Doc/code conflicts found.

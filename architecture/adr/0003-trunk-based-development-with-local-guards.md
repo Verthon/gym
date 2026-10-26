@@ -14,7 +14,8 @@ The workflow decides which of these places exists.
 ### Constraints
 - Team knowledge: one developer. No second person reviews changes.
 - Current architecture: git hooks run lint and type-check before each commit, and unit tests before each push.
-- Current architecture: a Claude Code hook blocks the agent from skipping the git hooks.
+- Current architecture: a Claude Code hook blocks the usual ways an agent skips or redirects the git hooks. A bypass hidden from the command text, such as a variable, `sh -c` or a script, is not blocked.
+- Current architecture: the repo is public on a personal GitHub account. Branch rules that block force pushes and branch deletion are available without pull requests. Rules that block pushes by file path are not available for this repo.
 - Current architecture: CI runs the same checks after each push to `main`.
 
 ## 2. Intention
@@ -24,7 +25,10 @@ The workflow decides which of these places exists.
 
 ### Measure
 - Every guard against a known agent mistake blocks the change before the commit reaches `main`. No guard depends on pull request review.
-- An agent edit to a safety-net file fails before the commit, by an edit tool or by a shell command. Safety-net files are the git hooks, the Claude Code settings and hooks, the CI workflow, and the lint, type-check and architecture-check configs.
+- An agent edit to a safety-net file fails before it reaches `main`. An edit through the agent's edit tools or a recognized shell write (`sed`, `tee`, a redirect, `cp`, `mv`) fails at the edit. Any other shell write, such as `git checkout` or a script, fails at the commit, through the check on staged safety-net files.
+- Human override: the human changes or commits safety-net files outside Claude Code, from their own editor or terminal.
+- Safety-net files are the git hooks, the Claude Code settings and hooks, the CI workflow, the repo scripts, the lint, type-check, architecture-check, unused-code, test and mutation-test configs, the pnpm workspace config, and the `scripts` field of `package.json`.
+- Residual risk, accepted: a hooks-path override hidden from the command text skips the git hooks. CI finds the result after the push.
 
 ## 3. Decision
 
@@ -45,7 +49,8 @@ CI repeats the checks after the push. It reports problems but does not block the
 - Agent guardrails: the agent meets every guard before the commit, at the earliest point it can act on the failure.
 
 ### Trade-offs
-- Server-side guards give no protection: code owners, branch protection, and CI that reads its rules from `main`. A push changes `main` directly.
+- Server-side guards give no protection for content: code owners, required reviews, and CI that reads its rules from `main`. A push changes `main` directly. Rules that block pushes by file path exist only for private repos on paid plans. Making the repo private on such a plan is a reason to revisit this.
+- Server-side branch rules still apply to history: blocking force pushes and deletion of `main` needs no pull request and works with direct pushes.
 - A change that passes the local guards is on `main` at once. CI finds problems only after the push.
 - The local guards must also block shell commands, not only the agent's edit tools. An agent can change a file with `sed` or a heredoc.
 - The guards must protect their own config files. Otherwise an agent can make a failing check pass by editing the rule.
