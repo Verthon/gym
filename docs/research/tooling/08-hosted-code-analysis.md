@@ -28,6 +28,45 @@ All claims come from vendor pricing pages and docs read on 2026-10-22. Nothing b
 - **Takeaway:** 1 useful finding from 1, on a single run. CodeRabbit finds real issues, but its suggested fixes take the finding literally, so verify each one against the code before acting. One run isn't enough to judge its precision. **[O]**
 - **Next:** more runs on other tasks, comparing CodeRabbit's findings with the critic agent's on the same diff. **[O]**
 
+## CodeRabbit trial batch (started 2026-10-25)
+
+- **Plan:** `coderabbit auth status` shows "Advanced (trial)", 14 days. The CLI limit is unchanged at 10 reviews per rolling hour, and usage billing is still inactive. The trial adds the cloud Coding Agent, which isn't used here because `code push` would bypass the local guards (ADR 0003). **[E]**
+- **No critic baseline:** the repo has no critic agent definition, so the batch measures CodeRabbit's precision alone. Each finding is verified against the code. **[E]**
+- **Method:** one review per single commit, `coderabbit review --committed --base-commit <sha>^ --agent` in a detached worktree. Raw JSONL output is kept in the session scratchpad only. **[E]**
+
+| Range | Files, +/− | Time | Findings | Real | Notes |
+|---|---|---|---|---|---|
+| uncommitted diff on `77b3948` (FR-C14 end date) | 13, +450/−687 | 3.5 min | 2 (1 major, 1 minor) | 0 as stated, 1 partial | The same finding twice: `SignedContract.create` accepts any `durationInMonths`. The draft already checks it against the offer (`ContractDraftService.mts:79`), so it only happens when the draft is bypassed. What it does show: the duration crosses stages as a raw `number`. |
+| `a93be56` | 16, +885/−489 | 4.3 min | 0 | — | |
+| `95768e2` | 2, +39/−14 | 1.3 min | 0 | — | The fix is clean. The double-emit bug it fixes comes from `87e292d`, which wasn't reviewed, so this run says nothing about recall. |
+| `c227455` | 27, +570/−451 | 2.4 min | 1 (major) | 0, false positive | "Pass `LocalDate` through the signing path". Its suggested diff quotes `private sign(at: Temporal.Instant)`, which only exists from `95768e2`/`ad0fe84` onward. At `c227455`, `UnsignedContract` and `contractSigned` both use `LocalDate`, so the types already agree. CodeRabbit read context from a later tree than the commit under review: HEAD, or the previous run in the batch. |
+| `35023fa` | 6, +157/−23 | 1.5 min | 0 | — | |
+| `ad0fe84` | 17, +65/−77 | 1.7 min | 0 | — | |
+| `87e292d` (alone) | 11, +406/−73 | 3.2 min | 1 (major) | 0 | "Implement the signed-contract payment workflow". Correct, but out of scope: the commit adds the unsigned stage, and the payment stage was a later task. It's a reminder that work is missing, not a defect. This commit isn't the origin of the double emit: each signing order emits exactly once here. |
+| `290ff38` (alone) | 5, +515/−349 | 3.3 min | 3 (all major) | 1 correct | **Recall hit.** "Two code paths now emit ContractSigned": it gives the exact call order (customer accepts, then sales confirms, then `toSignedContract`), notes the tests cover only the other order, and adds that `toSignedContract` isn't idempotent. This is the bug fixed later in `95768e2`, where `toSignedContract` no longer emits. The other 2 findings are false positives from the context leak: one asks for an `occurredAt: Temporal.Instant` argument, but nothing in `src` uses `Temporal` at `290ff38`; the other says `toGenericEvent` is missing, but `draft/events.mts` exports it at that commit. |
+
+- **Totals so far (9 runs, including 2026-10-22):** 8 findings. 2 are useful (in-memory aliasing, double ContractSigned), 1 is a partial (duration as a raw `number`, reported twice), 1 is correct but out of scope, and 3 are false positives, all caused by the context leak. **[E]**
+- **Recall:** 1 of 1 known later-fixed bug caught, with a correct reproduction order. The sample is n=1. **[E]**
+- **Caveat on historical ranges:** the `c227455` false positive shows CodeRabbit doesn't keep to the checked-out tree when it gathers context. Reviews of past commits are less reliable than reviews of the current diff. Its main use case, `--uncommitted` before a commit, isn't affected. **[E]**
+- **The leak isn't caused by batching:** `290ff38` ran alone and still quoted `Temporal.Instant` from a later tree, so CodeRabbit is pulling context from the repo's current state. Every finding on a past commit that names a symbol has to be checked against `git show <sha>:<file>`. **[E]**
+
+### Blind skill runs vs CodeRabbit (2026-10-25)
+
+Each skill ran in a fresh agent, which was given the skill and the code scope but not the defects. Target A: `unsigned-contract` at `290ff38`, the double `ContractSigned`. Target B: the current draft → signed-contract flow, the FR-C03 duration rule (`docs/tasks/membership-duration.md`). **[E]**
+
+| Reviewer | Findings (A / B) | Double emit (A) | Duration rule (B) | Verified extras |
+|---|---|---|---|---|
+| CodeRabbit | 3 / 2 | Caught, major, with the call order | Partial: `SignedContract.create` only | — |
+| `aggregate-designer` | 9 / 15 | Caught, High (A1, A3, A8) | Partial: one bullet inside B13, Low, `SignedContract` only | — |
+| `requirements-critic` | 12 / 34 | Caught, High (A1, A3) | **Full**, Low (B5): names `ContractDraftService.mts:79` checking only membership in the offer's list, and asks whether 1/3/6/12 is a Contracting or an Offering invariant | B4: FR-C03 allows 1 month, but FR-C15 forbids termination before 3 months, and D7 adopted both without reconciling them. Confirmed by reading FR-C03, FR-C15 and D7. |
+| `test-strategy-reviewer` | 6 / 20 | Caught, High (A1, A2): only one signing order tested | Missed. B16 says only one duration is tested, but not that invalid ones get in | B4: `ContractDraft.spec.mts:51` `toMatchObject({ occurredAt: at })` passes for any `Temporal.Instant`. Confirmed in a scratch Vitest run: `toMatchObject` passed with 2020 vs 2099, and `toEqual` failed. It's the only such assertion in `src`. |
+
+- **Recall:** all four caught the double emit. Only `requirements-critic` found the root of the duration gap (the offer's own durations aren't checked), and it rated it Low. **[E]**
+- **Noise:** the skills return 6–34 findings per target, against 1–3 from CodeRabbit. Most of the extras are unverified design or requirement opinions, and several repeat gaps already listed in `functional-requirements.md`. The two verified extras are the most valuable output of the comparison. Neither CodeRabbit nor the coder had found them. The FR-C03 vs FR-C15 conflict and the single signing order had both been reported by the 2026-09-28 skill runs (`docs/skill-runs/README.md`) and never became tasks, so the bottleneck was acting on the reports, not finding the problems. **[E]**
+- **Reports:** `docs/skill-runs/2026-10-25/`. Follow-ups: `docs/tasks/membership-duration.md`, `docs/tasks/tomatchobject-temporal.md`. **[E]**
+- **No context leak:** the skills read target A through `git show 290ff38:` and quoted no later code. **[E]**
+- **Takeaway (ours):** CodeRabbit is cheap and precise on code-level defects in the current diff. The requirements critic finds rule gaps that code-level review can't see, because the code is internally consistent. They overlap only on the obvious bug. **[O]**
+
 ## Comparison
 
 | Tool | Free tier (public repos) | Without PRs | Notes |
